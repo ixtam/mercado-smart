@@ -526,14 +526,20 @@
     const masterCategories = Object.keys(categoryMap);
 
     const localSuggestionsDB = [
-        { trigger: ['pasta', 'fideo', 'espagueti'], suggest: ['Salsa de tomate', 'Queso parmesano', 'Carne molida', 'Albahaca'] },
-        { trigger: ['carne', 'pollo', 'cerdo', 'chorizo'], suggest: ['Arroz', 'Papas', 'Carbón', 'Salsa BBQ', 'Limón'] },
-        { trigger: ['leche'], suggest: ['Cereal', 'Café', 'Galletas', 'Avena'] },
-        { trigger: ['detergente', 'ropa'], suggest: ['Suavizante', 'Jabón en barra', 'Cloro'] },
-        { trigger: ['pan', 'sandwich'], suggest: ['Jamón', 'Queso', 'Mayonesa', 'Mantequilla'] },
-        { trigger: ['arroz'], suggest: ['Frijoles', 'Aceite', 'Ajo', 'Cebolla'] },
-        { trigger: ['perro', 'gato', 'mascota'], suggest: ['Croquetas', 'Sobres', 'Arena', 'Premios'] },
-        { trigger: 'default', suggest: ['Huevos', 'Papel Higiénico', 'Aceite', 'Agua', 'Jabón', 'Leche'] }
+        { trigger: ['pasta', 'fideo', 'espagueti', 'macarrones'], suggest: ['Salsa de tomate', 'Queso parmesano', 'Carne molida', 'Albahaca', 'Orégano'] },
+        { trigger: ['carne', 'res', 'bife'], suggest: ['Papas', 'Cebolla', 'Tomate', 'Carbón', 'Sal gruesa', 'Chorizo'] },
+        { trigger: ['pollo', 'pechuga'], suggest: ['Limón', 'Ajo', 'Arroz', 'Zanahoria', 'Mayonesa', 'Papas'] },
+        { trigger: ['cerdo', 'chorizo'], suggest: ['Salsa BBQ', 'Limón', 'Tortillas', 'Aguacate', 'Cebolla'] },
+        { trigger: ['leche'], suggest: ['Cereal', 'Café', 'Galletas', 'Avena', 'Cacao', 'Pan'] },
+        { trigger: ['detergente', 'ropa'], suggest: ['Suavizante', 'Jabón en barra', 'Cloro', 'Ganchos', 'Pinzas'] },
+        { trigger: ['pan', 'sandwich', 'jamón'], suggest: ['Jamón', 'Queso', 'Mayonesa', 'Mantequilla', 'Lechuga', 'Tomate'] },
+        { trigger: ['arroz'], suggest: ['Lentejas', 'Aceite', 'Ajo', 'Cebolla', 'Huevo', 'Atún'] },
+        { trigger: ['perro', 'gato', 'mascota'], suggest: ['Croquetas', 'Sobres húmedos', 'Arena', 'Premios', 'Shampoo mascota'] },
+        { trigger: ['lechuga', 'ensalada'], suggest: ['Tomate', 'Pepino', 'Aceite de oliva', 'Limón', 'Zanahoria', 'Aguacate'] },
+        { trigger: ['harina', 'pastel'], suggest: ['Huevos', 'Azúcar', 'Mantequilla', 'Levadura', 'Leche', 'Vainilla'] },
+        { trigger: ['limpiar', 'baño', 'piso'], suggest: ['Cloro', 'Desinfectante', 'Esponja', 'Bolsas de basura', 'Guantes'] },
+        { trigger: ['pescado', 'atún', 'salmón'], suggest: ['Limón', 'Galletas saladas', 'Mayonesa', 'Cebolla', 'Cilantro'] },
+        { trigger: 'default', suggest: ['Huevos', 'Papel Higiénico', 'Aceite', 'Agua', 'Jabón de tocador', 'Leche', 'Tomate', 'Cebolla', 'Plátano', 'Manzana', 'Ajo', 'Limón', 'Frijoles', 'Azúcar'] }
     ];
 
     const input = document.getElementById('item-input');
@@ -618,16 +624,30 @@
     let aiTimeout = null;
     function triggerAIUpdate() {
         clearTimeout(aiTimeout);
-        aiTimeout = setTimeout(updateAISuggestions, 1500); 
+        // Reducimos el tiempo a 800ms para que reaccione rápido mientras escribes
+        aiTimeout = setTimeout(updateAISuggestions, 800); 
     }
 
     async function updateAISuggestions() {
         chipsContainer.innerHTML = '';
-        const activeItems = items.filter(i => !i.completed).map(i => i.text.toLowerCase());
+        
+        // 1. Obtener contexto en vivo (Lo que ya está en la lista + lo que se está escribiendo AHORA)
+        const currentInputText = input.value.trim().toLowerCase();
+        const activeItemsTexts = items.filter(i => !i.completed).map(i => i.text.toLowerCase());
+        
+        const contextWords = [...activeItemsTexts];
+        if (currentInputText) {
+            contextWords.push(currentInputText);
+        }
+
         const allCurrentItemNames = items.map(i => i.text.toLowerCase());
         
-        if (activeItems.length === 0) {
-            renderChips(["Frutas de temporada", "Ofertas del día", "Bolsas de basura", "Agua"]);
+        // Si no hay nada escrito ni en la lista, dar sugerencias frescas
+        if (contextWords.length === 0) {
+            const initialSuggestions = ["Manzana", "Tomate", "Carne de Res", "Huevos", "Leche", "Zanahoria", "Plátano", "Cebolla", "Pollo", "Aguacate", "Pan"]
+                .sort(() => 0.5 - Math.random())
+                .slice(0, 4);
+            renderChips(initialSuggestions);
             return;
         }
 
@@ -636,7 +656,7 @@
         // Intento con IA Real si hay clave API
         if (savedApiKey) {
             try {
-                const prompt = `Analiza esta lista de súper: ${activeItems.join(', ')}. Eres un Chef/Administrador de Hogar. Deduce qué receta o tarea preparan. Sugiere EXACTAMENTE 4 artículos complementarios útiles que falten. Responde SOLO con los 4 nombres separados por comas, sin puntos.`;
+                const prompt = `Analiza este contexto de lista de compras: ${contextWords.join(', ')}. Eres un Chef/Administrador de Hogar. Deduce qué receta o tarea preparan en base a esos artículos. Sugiere EXACTAMENTE 4 ingredientes o artículos complementarios que falten y tengan mucha relación. REGLA CRÍTICA: Sugiere productos ESPECÍFICOS exactos (ej. "Manzana", "Tomate"), NUNCA categorías generales. Responde SOLO con los 4 nombres específicos separados por comas, sin puntos.`;
                 const payload = { contents: [{ parts: [{ text: prompt }] }] };
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${savedApiKey}`;
 
@@ -644,7 +664,9 @@
                 if (response.ok) {
                     const result = await response.json();
                     const text = result.candidates[0].content.parts[0].text;
-                    let aiSuggestions = text.split(',').map(s => s.trim().replace(/['"]/g, '').replace(/^\w/, c => c.toUpperCase())).filter(s => s.length > 0 && !allCurrentItemNames.includes(s.toLowerCase()));
+                    let aiSuggestions = text.split(',')
+                        .map(s => s.trim().replace(/['"]/g, '').replace(/^\w/, c => c.toUpperCase()))
+                        .filter(s => s.length > 0 && !allCurrentItemNames.includes(s.toLowerCase())); // Filtra los que ya usaste
                     
                     if (aiSuggestions.length > 0) {
                         renderChips(aiSuggestions.slice(0, 4));
@@ -659,7 +681,7 @@
 
         // Fallback Inteligente Local
         let suggestionsToDisplay = new Set();
-        activeItems.forEach(itemText => {
+        contextWords.forEach(itemText => {
             localSuggestionsDB.forEach(rule => {
                 if (rule.trigger !== 'default' && rule.trigger.some(t => itemText.includes(t))) {
                     rule.suggest.forEach(s => suggestionsToDisplay.add(s));
@@ -671,10 +693,18 @@
             localSuggestionsDB.find(r => r.trigger === 'default').suggest.forEach(s => suggestionsToDisplay.add(s));
         }
 
-        const finalSuggestions = Array.from(suggestionsToDisplay)
-            .filter(s => !allCurrentItemNames.includes(s.toLowerCase())).slice(0, 4);
+        // Convertir a array, filtrar los repetidos/ya en lista, mezclar aleatoriamente y tomar los primeros 4
+        let finalSuggestions = Array.from(suggestionsToDisplay)
+            .filter(s => !allCurrentItemNames.includes(s.toLowerCase())) // Ya no sugiere los que usaste
+            .sort(() => 0.5 - Math.random()) // Mezcla para que salgan diferentes
+            .slice(0, 4);
             
-        renderChips(finalSuggestions.length > 0 ? finalSuggestions : ["Frutas", "Snacks"]);
+        // Fallback final
+        const fallbackSpecifics = ["Plátano", "Zanahoria", "Pan", "Aguacate", "Queso", "Limón"]
+            .filter(s => !allCurrentItemNames.includes(s.toLowerCase()))
+            .sort(() => 0.5 - Math.random());
+            
+        renderChips(finalSuggestions.length > 0 ? finalSuggestions : fallbackSpecifics.slice(0,4));
         aiLoading.style.display = 'none';
     }
 
@@ -771,6 +801,9 @@
 
     btnAdd.addEventListener('click', () => addItem(input.value));
     input.addEventListener('keypress', (e) => { if (e.key === 'Enter') addItem(input.value); });
+    
+    // NUEVO: Reaccionar en tiempo real mientras el usuario escribe
+    input.addEventListener('input', () => triggerAIUpdate());
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {

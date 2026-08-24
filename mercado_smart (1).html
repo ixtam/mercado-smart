@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mi Mercado Miwmiwmiw :3</title>
+    <!-- SortableJS para un Drag & Drop perfecto en Móvil y Desktop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --primary: #4CAF50;
+            --primary-light: #e8f5e9;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --border-radius: 16px;
+            --shadow: 0 4px 6px rgba(0,0,0,0.05);
+            --drag-bg: #f8fcf9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-bottom-left-radius: var(--border-radius);
+            border-bottom-right-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 20px;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-share {
+            background-color: #25D366; /* Color de WhatsApp */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+            transition: transform 0.2s;
+        }
+        
+        .btn-share:active {
+            transform: scale(0.9);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-mic { background-color: #3498db; }
+        
+        .btn-mic.recording {
+            background-color: #e74c3c;
+            animation: pulse 1.5s infinite;
+        }
+
+        .ai-suggestions {
+            background-color: var(--primary-light);
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 60px;
+        }
+
+        .ai-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .ai-loading {
+            font-size: 12px;
+            color: var(--primary);
+            animation: blink 1s infinite alternate;
+            display: none;
+        }
+
+        .chips-container {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+        
+        .chips-container::-webkit-scrollbar { display: none; }
+
+        .chip {
+            background-color: white;
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            border: 1px solid var(--primary);
+            transition: all 0.2s;
+        }
+
+        .chip:active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .content {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+
+        .category-group {
+            margin-bottom: 25px;
+        }
+
+        .category-title {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .sortable-list {
+            min-height: 20px; /* Dropzone when empty */
+            border-radius: 12px;
+            transition: background-color 0.3s;
+        }
+        
+        /* Highlight list when dragging over */
+        .sortable-list.highlight {
+            background-color: rgba(76, 175, 80, 0.05);
+            border: 1px dashed var(--primary);
+            padding: 5px;
+        }
+
+        .item {
+            background-color: var(--card-bg);
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow);
+            transition: opacity 0.3s, transform 0.2s;
+        }
+
+        .sortable-ghost {
+            opacity: 0.4;
+            background-color: var(--drag-bg);
+            border: 2px dashed var(--primary);
+        }
+
+        .drag-handle {
+            color: #bdc3c7;
+            font-size: 20px;
+            padding-right: 12px;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            touch-action: none; /* Crucial for mobile drag */
+        }
+        
+        .drag-handle:active { cursor: grabbing; }
+
+        .item.completed { opacity: 0.6; }
+
+        .item-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .item.completed .checkbox { background-color: var(--primary); }
+        .item.completed .checkbox::after {
+            content: "✓";
+            color: white;
+            font-weight: bold;
+        }
+
+        .item-text {
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .item.completed .item-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            font-size: 18px;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .delete-btn:active { background-color: #fdeaea; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+        
+        @keyframes blink {
+            from { opacity: 0.4; }
+            to { opacity: 1; }
+        }
+        
+        /* Modal personalizado */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center; justify-content: center;
+            z-index: 1000;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background: white; padding: 20px; border-radius: 12px;
+            max-width: 80%; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transform: translateY(-20px); transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+        .modal-button {
+            margin-top: 15px; padding: 10px 20px;
+            background-color: var(--primary); color: white;
+            border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <div class="header-top">
+            <h1>🛒 Mi Mercado Miwmiwmiw :3</h1>
+            <button class="btn-share" onclick="shareToWhatsApp()" title="Exportar a WhatsApp">
+                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            </button>
+        </div>
+        <div class="input-group">
+            <button class="btn btn-mic" id="btn-mic">🎤</button>
+            <input type="text" id="item-input" placeholder="Ej. Tomate, Leche, Jabón..." autocomplete="off">
+            <button class="btn" id="btn-add">➕</button>
+        </div>
+        
+        <div class="ai-suggestions" id="ai-section">
+            <div class="ai-header">
+                <span>✨ IA Sugiere:</span>
+                <span class="ai-loading" id="ai-loading">Pensando...</span>
+            </div>
+            <div class="chips-container" id="chips-container">
+                <!-- Chips generados por IA -->
+            </div>
+        </div>
+    </header>
+
+    <div class="content" id="list-container">
+        <!-- Listas renderizadas con SortableJS -->
+    </div>
+</div>
+
+<div class="modal-overlay" id="custom-alert">
+    <div class="modal-content">
+        <p id="alert-message"></p>
+        <button class="modal-button" onclick="closeAlert()">Aceptar</button>
+    </div>
+</div>
+
+<script>
+    function showAlert(message) {
+        document.getElementById('alert-message').textContent = message;
+        document.getElementById('custom-alert').classList.add('active');
+    }
+    function closeAlert() { document.getElementById('custom-alert').classList.remove('active'); }
+
+    // Categorías Base (siempre visibles para poder arrastrar hacia ellas)
+    const categoryMap = {
+        '🍎 Frutas y Verduras': ['tomate', 'cebolla', 'papa', 'zanahoria', 'limón', 'manzana', 'platano', 'lechuga', 'ajo', 'fruta', 'verdura', 'aguacate', 'brocoli', 'fresa'],
+        '🥩 Carnes y Proteínas': ['carne', 'pollo', 'pescado', 'cerdo', 'hamburguesa', 'salchicha', 'atún', 'salmón', 'pavo', 'chorizo', 'tocino'],
+        '🥛 Lácteos y Huevos': ['leche', 'queso', 'huevo', 'huevos', 'yogurt', 'mantequilla', 'nata', 'crema'],
+        '🍞 Despensa': ['arroz', 'fideo', 'pasta', 'azúcar', 'sal', 'aceite', 'pan', 'harina', 'cereal', 'galletas', 'café', 'te', 'lentejas', 'frijoles', 'garbanzos', 'mayonesa', 'ketchup', 'salsa'],
+        '🧼 Limpieza y Hogar': ['jabón', 'detergente', 'papel', 'lavavajillas', 'shampoo', 'esponja', 'basura', 'limpiador', 'cloro', 'suavizante', 'escoba', 'pasta dental', 'desodorante'],
+        '🥤 Bebidas': ['agua', 'jugo', 'refresco', 'cerveza', 'vino', 'soda', 'licor'],
+        '🍬 Snacks y Dulces': ['chocolate', 'papas fritas', 'dulces', 'helado', 'mani', 'chicle'],
+        '📦 Otros': []
+    };
+    
+    // Lista de categorías maestras para renderizar siempre
+    const masterCategories = Object.keys(categoryMap);
+
+    // Base de datos de respaldo amplia por si la API falla
+    const localSuggestionsDB = [
+        { trigger: ['pasta', 'fideo', 'espagueti'], suggest: ['Salsa de tomate', 'Queso parmesano', 'Carne molida', 'Albahaca'] },
+        { trigger: ['carne', 'pollo', 'cerdo'], suggest: ['Arroz', 'Papas', 'Carbón', 'Salsa BBQ'] },
+        { trigger: ['leche'], suggest: ['Cereal', 'Café', 'Galletas', 'Chocolate en polvo'] },
+        { trigger: ['detergente', 'ropa'], suggest: ['Suavizante', 'Jabón en barra', 'Cloro'] },
+        { trigger: ['pan', 'sandwich'], suggest: ['Jamón', 'Queso', 'Mayonesa', 'Mantequilla'] },
+        { trigger: ['arroz'], suggest: ['Frijoles', 'Lentejas', 'Aceite', 'Ajo'] },
+        { trigger: ['harina'], suggest: ['Huevos', 'Azúcar', 'Levadura', 'Mantequilla'] },
+        { trigger: ['shampoo'], suggest: ['Acondicionador', 'Jabón de cuerpo', 'Crema', 'Pasta dental'] },
+        { trigger: ['perro', 'gato', 'mascota'], suggest: ['Croquetas', 'Sobres', 'Arena', 'Premios'] },
+        { trigger: 'default', suggest: ['Huevos', 'Papel Higiénico', 'Aceite', 'Agua', 'Jabón', 'Leche'] }
+    ];
+
+    let items = JSON.parse(localStorage.getItem('mercado_items')) || [];
+    let sortableInstances = []; // Para limpiar instancias previas
+
+    const input = document.getElementById('item-input');
+    const btnAdd = document.getElementById('btn-add');
+    const btnMic = document.getElementById('btn-mic');
+    const listContainer = document.getElementById('list-container');
+    const chipsContainer = document.getElementById('chips-container');
+    const aiLoading = document.getElementById('ai-loading');
+
+    let aiTimeout = null;
+
+    function saveAndRender(skipSuggestionUpdate = false) {
+        localStorage.setItem('mercado_items', JSON.stringify(items));
+        renderList();
+        if (!skipSuggestionUpdate) {
+            triggerAIUpdate();
+        }
+    }
+
+    function determineCategory(itemName) {
+        const lowerName = itemName.toLowerCase();
+        for (const [category, keywords] of Object.entries(categoryMap)) {
+            if (keywords.some(kw => lowerName.includes(kw))) return category;
+        }
+        return '📦 Otros';
+    }
+
+    function addItem(name) {
+        if (!name.trim()) return;
+        const newItem = {
+            id: Date.now(),
+            text: name.trim(),
+            category: determineCategory(name),
+            completed: false
+        };
+        items.push(newItem);
+        input.value = '';
+        saveAndRender();
+    }
+
+    function toggleItem(id) {
+        const item = items.find(i => i.id === id);
+        if (item) {
+            item.completed = !item.completed;
+            saveAndRender(true); // No es necesario actualizar IA solo por check
+        }
+    }
+
+    function deleteItem(id) {
+        items = items.filter(i => i.id !== id);
+        saveAndRender();
+    }
+
+    function triggerAIUpdate() {
+        clearTimeout(aiTimeout);
+        // Debounce para no saturar la API al escribir o agregar rápido
+        aiTimeout = setTimeout(updateAISuggestions, 1500); 
+    }
+
+    async function updateAISuggestions() {
+        chipsContainer.innerHTML = '';
+        const activeItems = items.filter(i => !i.completed).map(i => i.text.toLowerCase());
+        const allCurrentItemNames = items.map(i => i.text.toLowerCase());
+        
+        if (activeItems.length === 0) {
+            renderChips(["Frutas de temporada", "Ofertas", "Snacks", "Bebidas"]);
+            return;
+        }
+
+        aiLoading.style.display = 'block';
+
+        try {
+            // Llamada a la API de Gemini (Inteligencia Artificial Real Mejorada)
+            const prompt = `El usuario tiene en su lista de supermercado: ${activeItems.join(', ')}. Eres un Chef y Administrador de Hogar experto. Analiza profundamente qué receta podrían estar preparando o qué tarea del hogar van a realizar basándote en esos elementos. Sugiere EXACTAMENTE 4 artículos, ingredientes o productos complementarios muy útiles, lógicos y creativos que falten comprar para completar su objetivo. Responde SOLO con los 4 nombres separados por comas. Sin viñetas, sin puntos, sin explicaciones.`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: "Eres un asistente de supermercado ultra inteligente. Devuelve solo una lista de palabras separadas por comas." }] }
+            };
+
+            const apiKey = ""; // Canvas provee la API key
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+            const candidate = result.candidates?.[0];
+            
+            if (candidate && candidate.content?.parts?.[0]?.text) {
+                const text = candidate.content.parts[0].text;
+                let aiSuggestions = text.split(',')
+                                        .map(s => s.trim().replace(/['"]/g, '').replace(/^\w/, c => c.toUpperCase()))
+                                        .filter(s => s.length > 0 && !allCurrentItemNames.includes(s.toLowerCase()));
+                
+                // Si la IA devolvió sugerencias válidas, las mostramos
+                if (aiSuggestions.length > 0) {
+                    renderChips(aiSuggestions.slice(0, 4));
+                    aiLoading.style.display = 'none';
+                    return; 
+                }
+            }
+        } catch (error) {
+            console.log("Fallback: Usando motor local de sugerencias.", error);
+        }
+
+        // --- Fallback a DB Local si falla la API o no hay internet ---
+        let suggestionsToDisplay = new Set();
+        activeItems.forEach(itemText => {
+            localSuggestionsDB.forEach(rule => {
+                if (rule.trigger !== 'default' && rule.trigger.some(t => itemText.includes(t))) {
+                    rule.suggest.forEach(s => suggestionsToDisplay.add(s));
+                }
+            });
+        });
+
+        if (suggestionsToDisplay.size === 0) {
+            const defaultRule = localSuggestionsDB.find(r => r.trigger === 'default');
+            defaultRule.suggest.forEach(s => suggestionsToDisplay.add(s));
+        }
+
+        const finalSuggestions = Array.from(suggestionsToDisplay)
+            .filter(s => !allCurrentItemNames.includes(s.toLowerCase()))
+            .slice(0, 4);
+            
+        renderChips(finalSuggestions.length > 0 ? finalSuggestions : ["Frutas de temporada", "Snacks saludables"]);
+        aiLoading.style.display = 'none';
+    }
+
+    function renderChips(suggestionsArray) {
+        chipsContainer.innerHTML = '';
+        suggestionsArray.forEach(suggestion => {
+            const chip = document.createElement('div');
+            chip.className = 'chip';
+            chip.innerText = '+ ' + suggestion;
+            chip.onclick = () => addItem(suggestion);
+            chipsContainer.appendChild(chip);
+        });
+    }
+
+    function shareToWhatsApp() {
+        if (items.length === 0) {
+            showAlert("Tu lista está vacía. ¡Agrega algunos productos primero!");
+            return;
+        }
+
+        let text = "🛒 *Mi Mercado Miwmiwmiw :3*\n\n";
+        
+        // Agrupar items por categoría
+        const grouped = items.reduce((acc, item) => {
+            if (!acc[item.category]) acc[item.category] = [];
+            acc[item.category].push(item);
+            return acc;
+        }, {});
+
+        // Construir el texto con formato enriquecido para WhatsApp
+        Object.keys(grouped).sort().forEach(category => {
+            text += `*${category}*\n`; // Categoría en Negrita
+            
+            // Ordenar: pendientes primero, completados después
+            grouped[category].sort((a, b) => a.completed - b.completed).forEach(item => {
+                if (item.completed) {
+                    text += `~- ${item.text}~\n`; // Texto tachado
+                } else {
+                    text += `- ${item.text}\n`; // Lista normal
+                }
+            });
+            text += "\n";
+        });
+
+        text += "_Generado con amor por Mi Mercado Miwmiwmiw :3 ✨_";
+
+        // Codificar el texto para URL y abrir WhatsApp
+        const encodedText = encodeURIComponent(text);
+        const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+        window.open(whatsappUrl, '_blank');
+    }
+
+    function renderList() {
+        // Destruir instancias previas de Sortable
+        sortableInstances.forEach(instance => instance.destroy());
+        sortableInstances = [];
+        listContainer.innerHTML = '';
+        
+        if (items.length === 0) {
+            listContainer.innerHTML = '<div class="empty-state">Tu lista está vacía.<br>Agrega algo para empezar. 🛒</div>';
+            return;
+        }
+
+        // Renderizar TODAS las categorías maestras para permitir Drag and Drop entre ellas
+        masterCategories.forEach(category => {
+            const categoryItems = items.filter(i => i.category === category);
+            
+            // Solo mostramos la categoría si tiene items, o si queremos que siempre esté visible.
+            // Para mantenerlo limpio, mostramos la categoría si tiene items, PERO
+            // si queremos permitir mover a cualquier lado, es mejor mostrarlas todas siempre 
+            // o crear un botón de "Mostrar todas las categorías".
+            // Para el diseño minimalista, mostraremos solo las que tienen items, MÁS una zona de "Otros"
+            // Espera, el usuario pidió "arrastrar a cualquier seccion". Mostraremos todas.
+            
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'category-group';
+            
+            const title = document.createElement('div');
+            title.className = 'category-title';
+            title.innerHTML = `<span>${category}</span> <span style="font-size:11px; opacity:0.5">${categoryItems.length}</span>`;
+            groupDiv.appendChild(title);
+
+            const itemListContainer = document.createElement('div');
+            itemListContainer.className = 'sortable-list';
+            itemListContainer.dataset.category = category; // Data crucial para el drop
+            
+            // Ordenar items: pendientes arriba, completados abajo
+            categoryItems.sort((a, b) => a.completed - b.completed).forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `item ${item.completed ? 'completed' : ''}`;
+                itemDiv.dataset.id = item.id; // Para identificarlo al arrastrar
+                
+                itemDiv.innerHTML = `
+                    <div class="drag-handle">≡</div>
+                    <div class="item-content" onclick="toggleItem(${item.id})">
+                        <div class="checkbox"></div>
+                        <div class="item-text">${item.text}</div>
+                    </div>
+                    <button class="delete-btn" onclick="event.stopPropagation(); deleteItem(${item.id})">🗑️</button>
+                `;
+                itemListContainer.appendChild(itemDiv);
+            });
+
+            groupDiv.appendChild(itemListContainer);
+            
+            // Solo añadir al DOM si tiene items o es la primera vez que se interactúa 
+            // (Para no saturar la vista, ocultamos las vacías con CSS si es necesario, 
+            // pero para D&D deben estar en el DOM)
+            if(categoryItems.length > 0 || items.length > 0) {
+                listContainer.appendChild(groupDiv);
+            }
+
+            // Inicializar Sortable JS en esta lista
+            const sortable = Sortable.create(itemListContainer, {
+                group: 'mercado-shared', // Permite arrastrar entre diferentes listas
+                animation: 150,
+                handle: '.drag-handle', // Solo arrastra por el icono
+                ghostClass: 'sortable-ghost',
+                emptyInsertThreshold: 20, // Facilita soltar en listas vacías
+                onEnd: function (evt) {
+                    const itemEl = evt.item;
+                    const itemId = parseInt(itemEl.dataset.id);
+                    const newCategory = evt.to.dataset.category;
+                    
+                    const itemIndex = items.findIndex(i => i.id === itemId);
+                    if (itemIndex > -1 && items[itemIndex].category !== newCategory) {
+                        items[itemIndex].category = newCategory;
+                        saveAndRender(true); // Re-renderizar para guardar el estado y agrupar correctamente
+                    }
+                }
+            });
+            
+            sortableInstances.push(sortable);
+        });
+    }
+
+    btnAdd.addEventListener('click', () => addItem(input.value));
+    
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addItem(input.value);
+    });
+
+    //    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'es-ES';
+        recognition.interimResults = false;
+        
+        let isRecording = false;
+
+        recognition.onstart = function() {
+            isRecording = true;
+            btnMic.classList.add('recording');
+            input.placeholder = "Escuchando...";
+        };
+
+        recognition.onspeechend = function() {
+            isRecording = false;
+            recognition.stop();
+            btnMic.classList.remove('recording');
+            input.placeholder = "Ej. Tomate, Leche, Jabón...";
+        };
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            const cleanText = transcript.replace(/\.$/, "");
+            input.value = cleanText;
+            addItem(cleanText);
+        };
+
+        recognition.onerror = function(event) {
+            isRecording = false;
+            btnMic.classList.remove('recording');
+            input.placeholder = "Ej. Tomate, Leche, Jabón...";
+            
+            let errMsg = "Error con el micrófono.";
+            if (event.error === 'not-allowed') {
+                errMsg = "🎤 Permiso denegado por el navegador. IMPORTANTE: Si estás en la Vista Previa, el micrófono es bloqueado por seguridad. ¡Descarga el HTML y ábrelo en una nueva pestaña para usarlo!";
+            } else if (event.error === 'no-speech') {
+                errMsg = "Silencio prolongado. No se detectó voz, intenta nuevamente.";
+            } else if (event.error === 'network') {
+                errMsg = "Error de red. El reconocimiento de voz necesita internet.";
+            } else {
+                errMsg = "Error inesperado: " + event.error;
+            }
+            
+            showAlert(errMsg);
+        };
+
+        btnMic.addEventListener('click', () => {
+            if (isRecording) {
+                recognition.stop(); // Permite cancelar si se vuelve a tocar
+                return;
+            }
+            try {
+                recognition.start();
+            } catch (e) {
+                console.log("Speech recognition error:", e);
+            }
+        });
+    } else {
+        // Fallback si el navegador no soporta el API de voz
+        btnMic.style.display = 'none';
+        console.warn("Speech Recognition API not supported in this browser.");
+    }
+
+    // Inicialización de la aplicación
+    saveAndRender(false); // Renderiza y llama a la IA por primera vez
+
+</script>
+</body>
+</html>

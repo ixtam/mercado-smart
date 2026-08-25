@@ -3,26 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mircadito :3</title>
+    <title>Miwrcadito :3</title>
     
-    <!-- Meta etiquetas para PWA (App Nativa) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#4CAF50" id="theme-color-meta">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
 
-    <!-- Librerías Externas -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         :root {
-            /* Tema Emerald (Por defecto) */
             --bg-color: #f4f7f6;
             --card-bg: #ffffff;
-            --primary: #107c41; /* Verde Excel */
+            --primary: #107c41; 
             --primary-light: #e8f5e9;
             --text-main: #2c3e50;
             --text-muted: #7f8c8d;
@@ -68,7 +66,8 @@
         .icon-btn.stats { background-color: #4285F4; color: white; }
         .icon-btn.reports { background-color: #9c27b0; color: white; }
         .icon-btn.settings { background-color: #7f8c8d; color: white; }
-        .icon-btn.tts { background-color: #ff9800; color: white; } /* Botón Voz */
+        .icon-btn.tts { background-color: #ff9800; color: white; }
+        .icon-btn.focus { background-color: #e74c3c; color: white; } /* Botón Modo Enfoque */
 
         .tabs { display: flex; background: var(--bg-color); border-radius: 12px; padding: 4px; margin-bottom: 15px; }
         .tab { flex: 1; text-align: center; padding: 8px; border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
@@ -98,10 +97,10 @@
         .chip { background-color: var(--card-bg); color: var(--primary); padding: 6px 12px; border-radius: 20px; font-size: 14px; white-space: nowrap; cursor: pointer; border: 1px solid var(--primary); transition: all 0.2s; }
         .chip:active { background-color: var(--primary); color: white; }
 
-        .budget-bar { background: var(--primary); color: white; padding: 10px 20px; text-align: center; font-weight: bold; font-size: 16px; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; margin-top: -10px; margin-bottom: 15px; position: relative; z-index: 90; display: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .budget-bar { background: var(--primary); color: white; padding: 10px 20px; text-align: center; font-weight: bold; font-size: 16px; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; margin-top: -10px; margin-bottom: 15px; position: relative; z-index: 90; display: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: all 0.3s; }
         .budget-bar.over-budget { background: var(--danger); }
 
-        .content { padding: 15px; flex: 1; overflow-y: auto; padding-bottom: 100px; }
+        .content { padding: 15px; flex: 1; overflow-y: auto; padding-bottom: 100px; transition: all 0.3s;}
         .category-group { margin-bottom: 25px; background: var(--card-bg); border-radius: 16px; padding: 15px; box-shadow: var(--shadow); transition: background-color 0.3s; }
         .category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--bg-color); padding-bottom: 8px; }
         .category-title { font-size: 15px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; display: flex; align-items: center; gap: 8px;}
@@ -128,7 +127,7 @@
         .dark-mode .inline-data { background: rgba(255,255,255,0.05); }
         .inline-label { font-size: 13px; color: var(--text-muted); font-weight: bold; }
         
-        .mini-input { background: var(--card-bg); border: 1px solid rgba(0,0,0,0.1); color: var(--text-main); font-size: 14px; text-align: center; outline: none; padding: 4px 2px; font-weight: bold; width: 45px; transition: all 0.2s; border-radius: 6px;}
+        .mini-input { background: var(--card-bg); border: 2px solid rgba(0,0,0,0.05); color: var(--text-main); font-size: 14px; text-align: center; outline: none; padding: 4px 2px; font-weight: bold; width: 45px; transition: all 0.2s; border-radius: 8px;}
         .dark-mode .mini-input { border-color: rgba(255,255,255,0.1); }
         .mini-input.price-input { width: 75px; }
         .mini-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-light); }
@@ -143,7 +142,7 @@
         .action-mini-btn.delete:active { color: var(--danger); }
         .action-mini-btn.fav { color: var(--warning); }
 
-        .fab-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 100; }
+        .fab-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 100; transition: all 0.3s;}
         .fab { width: 56px; height: 56px; border-radius: 50%; border: none; background-color: var(--primary); color: white; font-size: 24px; box-shadow: 0 6px 12px rgba(0,0,0,0.2); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
         .fab:active { transform: scale(0.9); }
         .fab.sweep { background-color: var(--warning); color: #333; }
@@ -186,6 +185,26 @@
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); } 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); } }
         .empty-state { text-align: center; color: var(--text-muted); margin-top: 40px; font-size: 16px; padding: 20px;}
         input[type="file"] { display: none; }
+
+        /* MODO ENFOQUE / SUPERMERCADO */
+        body.focus-mode header { display: none !important; }
+        body.focus-mode .fab-container { display: none !important; }
+        body.focus-mode .budget-bar { border-radius: 0; margin: 0; position: sticky; top: 0; z-index: 1000; font-size: 18px; padding: 15px;}
+        body.focus-mode .item { transform: scale(1.02); margin-bottom: 12px; box-shadow: var(--shadow); } 
+        body.focus-mode .content { padding-bottom: 120px; }
+        
+        #exit-focus-btn { display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--danger); color: white; padding: 15px 30px; border-radius: 30px; font-weight: bold; z-index: 2000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none; font-size: 16px; cursor: pointer; transition: transform 0.2s;}
+        #exit-focus-btn:active { transform: translateX(-50%) scale(0.95); }
+        body.focus-mode #exit-focus-btn { display: flex; align-items: center; gap: 8px;}
+
+        /* Historial Item */
+        .history-ticket { background: var(--bg-color); border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        .dark-mode .history-ticket { border-color: rgba(255,255,255,0.05); }
+        .ticket-info { display: flex; flex-direction: column; gap: 4px; }
+        .ticket-date { font-weight: bold; color: var(--text-main); font-size: 14px;}
+        .ticket-details { font-size: 12px; color: var(--text-muted); }
+        .btn-repeat { background: var(--primary-light); color: var(--primary); border: none; border-radius: 8px; padding: 8px 12px; font-weight: bold; cursor: pointer; transition: all 0.2s;}
+        .btn-repeat:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -193,9 +212,9 @@
 <div class="app-container">
     <header>
         <div class="header-top">
-            <h1>🛒 Mircadito :3</h1>
+            <h1>🛒 Miwrcadito :3</h1>
             <div class="action-btns">
-                <!-- Botón de voz (NUEVO) -->
+                <button class="icon-btn focus" onclick="toggleFocusMode()" title="Modo Supermercado">👁️</button>
                 <button class="icon-btn tts" onclick="readPendingList()" title="Leer pendientes en voz alta">🔊</button>
                 <label for="file-upload" class="icon-btn excel" title="Cargar Excel">📁</label>
                 <input id="file-upload" type="file" accept=".xlsx, .xls" onchange="importExcel(event)" />
@@ -211,6 +230,10 @@
             <div class="tab" id="tab-pending" onclick="setFilter('pending')">Pendientes</div>
             <div class="tab" id="tab-completed" onclick="setFilter('completed')">Comprados</div>
             <div class="tab" id="tab-sort" onclick="sortListByPrice()" style="color: var(--primary);"><span id="sort-icon">💲 Ordenar</span></div>
+        </div>
+
+        <div class="search-bar-container" style="margin-bottom: 15px;">
+            <input type="text" id="search-filter" placeholder="🔍 Buscar producto en la lista..." onkeyup="renderList()" style="width: 100%; padding: 10px 15px; border-radius: 12px; border: 1px solid #e0e0e0; background-color: var(--bg-color); color: var(--text-main); outline: none;">
         </div>
 
         <div class="input-group">
@@ -229,15 +252,18 @@
     </header>
 
     <div class="budget-bar" id="budget-bar" onclick="openCalculator()">
-        Total en Carrito: Bs.<span id="budget-total">0.00</span>
+        <span id="budget-prefix">Total en Carrito: Bs. </span><span id="budget-total">0.00</span>
     </div>
 
     <div class="content" id="list-container"></div>
 
     <div class="fab-container">
+        <button class="fab recipe" onclick="generateTicket()" title="Generar Ticket de Compra" style="background-color: #2c3e50;">🧾</button>
         <button class="fab recipe" onclick="generateRecipe()" title="Chef IA (Generar Receta)" id="btn-recipe">🍳</button>
         <button class="fab sweep" onclick="archiveCompleted()" title="Archivar Comprados al Historial">🧹</button>
     </div>
+    
+    <button id="exit-focus-btn" onclick="toggleFocusMode()"><span>❌</span> Salir de Modo Supermercado</button>
 </div>
 
 <!-- Modal Edición -->
@@ -257,19 +283,24 @@
             <label>Nota / Detalle</label>
             <input type="text" id="edit-detail" placeholder="Ej: Marca, 2 Litros...">
         </div>
-        <div class="form-group" id="edit-price-group" style="display:none;">
+        <div class="form-group" id="edit-price-group" style="display:block;">
             <label>Precio (Bs.)</label>
             <input type="number" id="edit-price" step="0.5" min="0">
+            <div style="display: flex; gap: 8px; margin-top: 10px;" id="discount-chips">
+                <button type="button" class="fav-chip" onclick="applyDiscount(10)">-10%</button>
+                <button type="button" class="fav-chip" onclick="applyDiscount(20)">-20%</button>
+                <button type="button" class="fav-chip" onclick="applyDiscount(50)">-50%</button>
+            </div>
         </div>
         <button class="modal-btn primary" onclick="saveEdit()">Guardar Cambios</button>
         <button class="modal-btn secondary" onclick="closeModal('edit-modal')">Cancelar</button>
     </div>
 </div>
 
-<!-- Modal Ajustes -->
+<!-- Modal Ajustes (Con Backup / Import) -->
 <div class="modal" id="settings-modal">
     <div class="modal-content">
-        <div class="modal-title">⚙️ Ajustes de la App</div>
+        <div class="modal-title">⚙️ Ajustes Premium Pro</div>
         <div class="setting-row">
             <span>Tema Oscuro</span>
             <label class="switch"><input type="checkbox" id="set-dark"><span class="slider"></span></label>
@@ -284,10 +315,10 @@
             </select>
         </div>
         <div class="setting-row">
-            <span>Control de Precios / Presupuesto</span>
-            <label class="switch"><input type="checkbox" id="set-prices" onchange="togglePrices()"><span class="slider"></span></label>
+            <span>Control de Precios Obligatorio</span>
+            <label class="switch"><input type="checkbox" id="set-prices" checked disabled><span class="slider"></span></label>
         </div>
-        <div class="form-group" id="budget-limit-group" style="display:none; margin-top: 10px;">
+        <div class="form-group" id="budget-limit-group" style="margin-top: 10px;">
             <label>Límite de Presupuesto Máximo (Bs.)</label>
             <input type="number" id="set-budget-limit" placeholder="Ej. 1500" onchange="updateBudgetUI()">
         </div>
@@ -296,11 +327,21 @@
             <label class="switch"><input type="checkbox" id="set-wakelock" onchange="toggleWakeLock()"><span class="slider"></span></label>
         </div>
         <div class="form-group" style="margin-top: 15px;">
-            <label>Llave API Gemini (Opcional)</label>
+            <label>Llave API Gemini (Opcional para Chef IA)</label>
             <input type="password" id="set-apikey" placeholder="Pega tu API Key de Google aquí...">
             <small style="color: var(--text-muted); font-size: 11px;">Tus datos se guardan solo en tu dispositivo.</small>
         </div>
+        
+        <div style="margin-top: 25px; border-top: 1px solid var(--bg-color); padding-top: 15px;">
+            <label style="font-weight: bold; font-size: 14px; margin-bottom: 10px; display:block;">💾 Respaldo y Restauración Total</label>
+            <button class="modal-btn" style="background: var(--info); color: white; margin-top: 0; margin-bottom: 10px;" onclick="exportBackup()">📥 Descargar Copia de Seguridad</button>
+            
+            <label for="import-backup" class="modal-btn secondary" style="display: flex; align-items: center; justify-content: center; margin-top: 0; text-align:center;">📤 Cargar Copia de Seguridad</label>
+            <input id="import-backup" type="file" accept=".json" onchange="importBackup(event)" style="display:none;" />
+        </div>
+
         <button class="modal-btn primary" onclick="saveSettings()">Aplicar Ajustes</button>
+        <button class="modal-btn secondary" onclick="closeModal('settings-modal')">Cerrar</button>
     </div>
 </div>
 
@@ -321,6 +362,31 @@
             <h2 style="color: var(--text-main); font-size: 28px;" id="calc-change">Bs.0.00</h2>
         </div>
         <button class="modal-btn secondary" onclick="closeModal('calc-modal')">Cerrar</button>
+    </div>
+</div>
+
+<!-- Modal Ticket de Compra -->
+<div class="modal" id="ticket-modal">
+    <div class="modal-content" style="background: #fff; color: #000; font-family: 'Courier New', Courier, monospace; border-radius: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <div id="ticket-capture-area" style="background: #fff; padding: 20px; margin: -20px -20px 20px -20px;">
+            <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
+                <h2 style="margin: 0; font-size: 22px;">MIWRCADITO :3</h2>
+                <p style="margin: 5px 0 0 0; font-size: 12px; font-weight: bold;">TICKET DE COMPRA VIRTUAL</p>
+                <p style="margin: 2px 0 0 0; font-size: 12px;" id="ticket-date"></p>
+            </div>
+            <div id="ticket-items" style="font-size: 14px; line-height: 1.5;"></div>
+            <div style="border-top: 1px dashed #000; margin-top: 10px; padding-top: 10px; text-align: right;">
+                <strong style="font-size: 18px;">TOTAL: Bs. <span id="ticket-total">0.00</span></strong>
+            </div>
+            <div style="text-align: center; margin-top: 25px;">
+                <p style="font-size: 12px;">¡Gracias por usar Miwrcadito :3!</p>
+            </div>
+        </div>
+        
+        <button class="modal-btn" id="btn-share-ticket" style="background: #25D366; color: white; border: none; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit;" onclick="shareTicket()">
+            <span>💬</span> Guardar y Compartir (WhatsApp)
+        </button>
+        <button class="modal-btn secondary" style="margin-top: 10px; border-color: #000; color: #000; font-family: inherit; font-weight: bold;" onclick="closeModal('ticket-modal')">Cerrar Ticket</button>
     </div>
 </div>
 
@@ -364,8 +430,8 @@
                 <strong style="font-size: 24px; color: var(--primary);" id="stat-completed">0</strong>
                 <div style="font-size: 12px; color: var(--text-muted);">Comprados</div>
             </div>
-            <div id="stat-money-box" style="display: none;">
-                <strong style="font-size: 24px; color: var(--primary);" id="stat-money">Bs.0.00</strong>
+            <div id="stat-money-box">
+                <strong style="font-size: 24px; color: var(--primary);" id="stat-money">Bs. 0.00</strong>
                 <div style="font-size: 12px; color: var(--text-muted);">Gastado</div>
             </div>
         </div>
@@ -375,13 +441,13 @@
         </div>
 
         <button class="modal-btn" style="background-color: #107c41; color: white; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="exportStatsToExcel()">
-            <span>📥</span> Exportar Carrito a Excel
+            <span>📥</span> Exportar Resumen a Excel
         </button>
         <button class="modal-btn secondary" onclick="closeModal('stats-modal')">Cerrar</button>
     </div>
 </div>
 
-<!-- Modal Reportes e Historial -->
+<!-- Modal Reportes e Historial (PREMIUM PRO) -->
 <div class="modal" id="reports-modal">
     <div class="modal-content" style="max-width: 450px;">
         <div class="modal-title">📅 Reportes e Historial</div>
@@ -389,23 +455,31 @@
         <div style="background: var(--bg-color); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--card-bg);">
                 <span style="color: var(--text-muted); font-size: 14px;">Gasto de Hoy:</span>
-                <strong style="color: var(--primary); font-size: 16px;" id="rep-day">Bs.0.00</strong>
+                <strong style="color: var(--primary); font-size: 16px;" id="rep-day">Bs. 0.00</strong>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--card-bg);">
                 <span style="color: var(--text-muted); font-size: 14px;">Esta Semana:</span>
-                <strong style="color: var(--primary); font-size: 16px;" id="rep-week">Bs.0.00</strong>
+                <strong style="color: var(--primary); font-size: 16px;" id="rep-week">Bs. 0.00</strong>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--card-bg);">
                 <span style="color: var(--text-muted); font-size: 14px;">Este Mes:</span>
-                <strong style="color: var(--primary); font-size: 16px;" id="rep-month">Bs.0.00</strong>
+                <strong style="color: var(--primary); font-size: 16px;" id="rep-month">Bs. 0.00</strong>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--card-bg);">
                 <span style="color: var(--text-muted); font-size: 14px;">Este Año:</span>
-                <strong style="color: var(--primary); font-size: 16px;" id="rep-year">Bs.0.00</strong>
+                <strong style="color: var(--primary); font-size: 16px;" id="rep-year">Bs. 0.00</strong>
             </div>
             <div style="display: flex; justify-content: space-between; font-weight: bold;">
                 <span style="color: var(--text-main); font-size: 14px;">Total Histórico:</span>
-                <strong style="color: var(--primary); font-size: 16px;" id="rep-all">Bs.0.00</strong>
+                <strong style="color: var(--primary); font-size: 16px;" id="rep-all">Bs. 0.00</strong>
+            </div>
+        </div>
+
+        <!-- Seccion Clonar Compras -->
+        <div style="margin-bottom: 20px;">
+            <label style="font-size: 14px; font-weight: bold; color: var(--text-main); display: block; margin-bottom: 10px;">🛒 Últimos Tickets (Repetir Compras)</label>
+            <div id="recent-tickets-container" style="max-height: 150px; overflow-y: auto; padding-right: 5px;">
+                <!-- Aquí van los tickets recientes -->
             </div>
         </div>
 
@@ -423,7 +497,7 @@
             </button>
         </div>
 
-        <button class="modal-btn secondary" style="color: var(--danger); margin-top: 10px; border-color: var(--danger);" onclick="clearHistory()">🗑️ Borrar Todo el Historial</button>
+        <button class="modal-btn secondary" id="btn-clear-history" style="color: var(--danger); margin-top: 10px; border-color: var(--danger);" onclick="clearHistory()">🗑️ Borrar Todo el Historial</button>
         <button class="modal-btn secondary" onclick="closeModal('reports-modal')">Cerrar</button>
     </div>
 </div>
@@ -434,41 +508,35 @@
 </div>
 
 <script>
-    // --- ESTADO DE LA APLICACIÓN ---
-    const APP_VERSION = "3.0";
+    const APP_VERSION = "4.0 Ultimate";
     let items = JSON.parse(localStorage.getItem('mercado_items')) || [];
     let history = JSON.parse(localStorage.getItem('mercado_history')) || [];
     let favorites = JSON.parse(localStorage.getItem('mercado_favorites')) || [];
-    // NUEVO: Memoria fotográfica de precios
     let priceMemory = JSON.parse(localStorage.getItem('mercado_prices')) || {}; 
     
     let settings = JSON.parse(localStorage.getItem('mercado_settings')) || {
         darkMode: false,
         theme: 'emerald',
-        pricesEnabled: true,
+        pricesEnabled: true, // SIEMPRE TRUE AHORA
         budgetLimit: 0,
         wakeLockEnabled: false,
         apiKey: ''
     };
     
-    if (settings.pricesEnabled === false && !localStorage.getItem('precios_forzados_v2')) {
-        settings.pricesEnabled = true;
-        localStorage.setItem('precios_forzados_v2', 'true');
-        localStorage.setItem('mercado_settings', JSON.stringify(settings));
-    }
+    settings.pricesEnabled = true;
 
     let currentFilter = 'all';
     let isSortDesc = true;
     let wakeLock = null;
     let html5QrcodeScanner = null;
     let chartInstance = null;
+    let clearConfirmTimer = null;
     
     // Variables de Deshacer
     let lastDeletedItems = [];
     let lastActionType = ''; 
     let lastHistorySessionId = null;
 
-    // --- BASE DE DATOS LOCAL ---
     const categoriesInfo = {
         '🍎 FRUTAS Y VERDURAS': { keys: ['tomate', 'cebolla', 'papa', 'zanahoria', 'limón', 'manzana', 'platano', 'lechuga', 'ajo', 'fruta', 'verdura', 'aguacate', 'cilantro', 'pimiento', 'brocoli', 'espinaca', 'apio', 'zapallo', 'arveja', 'haba', 'vainitas', 'palta', 'uva', 'fresa', 'naranja', 'pera', 'durazno', 'sandia', 'melon', 'papaya', 'piña', 'champiñon'], icon: '🍎', color: '#4CAF50' },
         '🥩 CARNES Y PROTEÍNAS': { keys: ['carne', 'pollo', 'pescado', 'cerdo', 'hamburguesa', 'salchicha', 'atún', 'bistec', 'molida', 'chuleta', 'camarón', 'pechuga', 'corazones', 'milanesas', 'sardinas', 'chorizo', 'tocino', 'jamon', 'mortadela'], icon: '🥩', color: '#F44336' },
@@ -489,14 +557,13 @@
 
     const fallbackSuggestions = ['Manzana', 'Huevos', 'Leche', 'Pan Integral', 'Papel Higiénico', 'Aceite de Oliva', 'Cebolla', 'Tomate', 'Jabón', 'Arroz'];
 
-    // --- ELEMENTOS DEL DOM ---
     const input = document.getElementById('item-input');
     const listContainer = document.getElementById('list-container');
     const chipsContainer = document.getElementById('chips-container');
     const budgetBar = document.getElementById('budget-bar');
     const favoritesBar = document.getElementById('favorites-bar');
 
-    // --- INICIALIZACIÓN ---
+    // --- STREAMING_CHUNK: Inicialización y Modo Enfoque ---
     function init() {
         applySettings();
         populateCategorySelect();
@@ -505,7 +572,66 @@
         updateAISuggestions();
     }
 
-    // --- STREAMING_CHUNK: Lógica de Lista y Agregar ---
+    function toggleFocusMode() {
+        document.body.classList.toggle('focus-mode');
+        if (document.body.classList.contains('focus-mode')) {
+            showToast("👁️ Modo Supermercado Activado");
+            setFilter('pending'); 
+        } else {
+            showToast("Saliendo del modo enfoque...");
+            setFilter('all');
+        }
+    }
+
+    // --- STREAMING_CHUNK: Backup & Restore (Premium Pro) ---
+    function exportBackup() {
+        const data = {
+            items, history, favorites, priceMemory, settings, version: APP_VERSION
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Miwrcadito_Respaldo_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast("Copia de seguridad exportada 💾");
+    }
+
+    function importBackup(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.items) items = data.items;
+                if (data.history) history = data.history;
+                if (data.favorites) favorites = data.favorites;
+                if (data.priceMemory) priceMemory = data.priceMemory;
+                if (data.settings) settings = data.settings;
+
+                localStorage.setItem('mercado_items', JSON.stringify(items));
+                localStorage.setItem('mercado_history', JSON.stringify(history));
+                localStorage.setItem('mercado_favorites', JSON.stringify(favorites));
+                localStorage.setItem('mercado_prices', JSON.stringify(priceMemory));
+                localStorage.setItem('mercado_settings', JSON.stringify(settings));
+
+                init();
+                showToast("Datos restaurados correctamente ✅");
+                closeModal('settings-modal');
+            } catch (err) {
+                showToast("Error: Archivo de respaldo no válido");
+                console.error(err);
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+
+    // --- STREAMING_CHUNK: Agregar Items y Lógica Principal ---
     function determineCategory(itemName) {
         const lowerName = itemName.toLowerCase();
         for (const [category, data] of Object.entries(categoriesInfo)) {
@@ -515,47 +641,31 @@
         return '📦 OTROS';
     }
 
-    function processMassiveInput(text) {
-        const separators = /[,\n]|\by\b/i;
-        const rawItems = text.split(separators).map(i => i.trim()).filter(i => i.length > 1);
-        
-        if (rawItems.length > 1) {
-            rawItems.forEach(name => {
-                // Asignar precio de memoria si existe
-                const defaultPrice = priceMemory[name.toLowerCase().trim()] || 0;
-                items.push({ id: Date.now() + Math.random(), text: name, category: determineCategory(name), completed: false, price: defaultPrice, quantity: 1, detail: '' });
-            });
-            showToast(`${rawItems.length} artículos añadidos masivamente`);
-            return true;
-        }
-        return false;
-    }
-
     function addItem(name) {
         if (!name.trim()) return;
         
-        if (processMassiveInput(name)) {
-            input.value = '';
-            saveAndRender();
-            return;
-        }
+        const separators = /[,\n]|\by\b/i;
+        const rawItems = name.split(separators).map(i => i.trim()).filter(i => i.length > 1);
+        
+        let addedCount = 0;
+        rawItems.forEach(cleanName => {
+            const defaultPrice = priceMemory[cleanName.toLowerCase()] || 0;
+            items.push({
+                id: Date.now() + Math.random(),
+                text: cleanName,
+                category: determineCategory(cleanName),
+                completed: false,
+                price: defaultPrice,
+                quantity: 1,
+                detail: ''
+            });
+            addedCount++;
+        });
 
-        const cleanName = name.trim();
-        const defaultPrice = priceMemory[cleanName.toLowerCase()] || 0;
-
-        const newItem = {
-            id: Date.now(),
-            text: cleanName,
-            category: determineCategory(cleanName),
-            completed: false,
-            price: defaultPrice,
-            quantity: 1,
-            detail: ''
-        };
-        items.push(newItem);
         input.value = '';
         saveAndRender();
         vibrate(50);
+        if(addedCount > 1) showToast(`${addedCount} artículos añadidos`);
     }
 
     function toggleItem(id, event) {
@@ -573,6 +683,21 @@
         }
     }
 
+    function updateItemField(id, field, value) {
+        const item = items.find(i => i.id === id);
+        if(item) {
+            let num = parseFloat(value);
+            if(isNaN(num) || num < 0) num = field === 'quantity' ? 1 : 0;
+            item[field] = num;
+            
+            if (field === 'price' && num > 0) {
+                priceMemory[item.text.toLowerCase().trim()] = num;
+                localStorage.setItem('mercado_prices', JSON.stringify(priceMemory));
+            }
+            saveAndRender();
+        }
+    }
+
     function confirmDelete(id) {
         const itemIndex = items.findIndex(i => i.id === id);
         if (itemIndex > -1) {
@@ -585,35 +710,153 @@
         }
     }
 
-    // --- STREAMING_CHUNK: Voz y Text-to-Speech ---
-    function readPendingList() {
-        if (!('speechSynthesis' in window)) {
-            showToast("Tu navegador no soporta lectura de voz.");
-            return;
-        }
-        
-        const pending = items.filter(i => !i.completed);
-        if (pending.length === 0) {
-            showToast("No tienes productos pendientes.");
-            return;
-        }
-        
-        window.speechSynthesis.cancel(); // Detener si estaba leyendo algo antes
-        
-        let speechText = "Te falta comprar: ";
-        pending.forEach(item => {
-            speechText += `${item.quantity > 1 ? item.quantity : ''} ${item.text}. `;
-        });
-        
-        const msg = new SpeechSynthesisUtterance(speechText);
-        msg.lang = 'es-ES';
-        msg.rate = 0.9; // Un poco más lento para claridad
-        window.speechSynthesis.speak(msg);
-        
-        showToast("🔊 Leyendo lista en voz alta...");
+    // --- STREAMING_CHUNK: Interfaz y UI Dinámica ---
+    function setFilter(f) {
+        currentFilter = f;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(`tab-${f}`).classList.add('active');
+        renderList();
     }
 
-    // --- STREAMING_CHUNK: Historial y Archivado ---
+    function sortListByPrice() {
+        isSortDesc = !isSortDesc;
+        const icon = isSortDesc ? "⬇️" : "⬆️";
+        document.getElementById('sort-icon').innerText = `${icon} Precio`;
+        renderList();
+    }
+
+    function renderList() {
+        listContainer.innerHTML = '';
+        let filteredItems = [...items];
+
+        const searchTerm = (document.getElementById('search-filter')?.value || '').toLowerCase().trim();
+
+        if (currentFilter === 'pending') filteredItems = filteredItems.filter(i => !i.completed);
+        if (currentFilter === 'completed') filteredItems = filteredItems.filter(i => i.completed);
+
+        if (searchTerm) {
+            filteredItems = filteredItems.filter(i => i.text.toLowerCase().includes(searchTerm) || (i.detail && i.detail.toLowerCase().includes(searchTerm)));
+        }
+
+        if (filteredItems.length === 0) {
+            listContainer.innerHTML = '<div class="empty-state">No hay productos aquí.<br>Agrega algo para empezar. 🛒</div>';
+            updateBudgetUI();
+            return;
+        }
+
+        filteredItems.sort((a, b) => isSortDesc ? (b.price||0) - (a.price||0) : (a.price||0) - (b.price||0));
+
+        const grouped = filteredItems.reduce((acc, item) => {
+            if (!acc[item.category]) acc[item.category] = [];
+            acc[item.category].push(item);
+            return acc;
+        }, {});
+
+        Object.keys(grouped).sort().forEach(category => {
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'category-group';
+            groupDiv.dataset.category = category;
+            
+            const catInfo = categoriesInfo[category] || categoriesInfo['📦 OTROS'];
+            
+            const header = document.createElement('div');
+            header.className = 'category-header';
+            header.innerHTML = `
+                <div class="category-title"><span style="font-size:20px">${catInfo.icon}</span> ${category}</div>
+                <div style="font-size: 12px; color: var(--text-muted); font-weight: bold;">${grouped[category].length}</div>
+            `;
+            groupDiv.appendChild(header);
+
+            const listDiv = document.createElement('div');
+            listDiv.className = 'sortable-list';
+
+            grouped[category].forEach(item => {
+                const isFav = favorites.includes(item.text);
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `item ${item.completed ? 'completed' : ''}`;
+                itemDiv.dataset.id = item.id;
+                
+                let detailsHTML = '';
+                if(item.detail) detailsHTML += `<span>${item.detail}</span>`;
+
+                itemDiv.innerHTML = `
+                    <div class="item-main" onclick="toggleItem(${item.id}, event)">
+                        <span class="drag-handle">≡</span>
+                        <div class="checkbox"></div>
+                        <div class="item-info">
+                            <div class="item-text">${item.text}</div>
+                            ${detailsHTML ? `<div class="item-details">${detailsHTML}</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="item-actions-container">
+                        <div class="inline-data" onclick="event.stopPropagation()">
+                            <span class="inline-label">Cant:</span>
+                            <input type="number" class="mini-input qty-input" value="${item.quantity || 1}" min="1" onchange="updateItemField(${item.id}, 'quantity', this.value)" onclick="this.select()">
+                            <span class="inline-label" style="margin-left: 5px;">Bs.</span>
+                            <input type="number" class="mini-input price-input" value="${item.price || 0}" min="0" step="0.5" onchange="updateItemField(${item.id}, 'price', this.value)" onclick="this.select()">
+                        </div>
+                        <div class="item-actions">
+                            <button class="action-mini-btn fav" onclick="toggleFavorite('${item.text}')">${isFav ? '⭐' : '☆'}</button>
+                            <button class="action-mini-btn edit" onclick="openEdit(${item.id})">✏️</button>
+                            <button class="action-mini-btn delete" onclick="confirmDelete(${item.id})">🗑️</button>
+                        </div>
+                    </div>
+                `;
+                listDiv.appendChild(itemDiv);
+            });
+
+            groupDiv.appendChild(listDiv);
+            listContainer.appendChild(groupDiv);
+
+            new Sortable(listDiv, {
+                group: 'shared',
+                handle: '.drag-handle',
+                animation: 150,
+                onEnd: function (evt) {
+                    const itemEl = evt.item;
+                    const itemId = Number(itemEl.dataset.id);
+                    const newCategory = evt.to.closest('.category-group').dataset.category;
+                    
+                    const item = items.find(i => i.id === itemId);
+                    if(item && item.category !== newCategory) {
+                        item.category = newCategory;
+                        saveAndRender();
+                        vibrate(50);
+                    }
+                }
+            });
+        });
+
+        updateBudgetUI();
+    }
+
+    function updateBudgetUI() {
+        budgetBar.style.display = 'block';
+        let currentTotal = 0;
+        let prefixText = "Total de la Lista: Bs. ";
+
+        if (currentFilter === 'all') {
+            currentTotal = items.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+            prefixText = "Total de la Lista: Bs. ";
+        } else if (currentFilter === 'pending') {
+            currentTotal = items.filter(i => !i.completed).reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+            prefixText = "Total Pendientes: Bs. ";
+        } else if (currentFilter === 'completed') {
+            currentTotal = items.filter(i => i.completed).reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+            prefixText = "Total Comprados: Bs. ";
+        }
+
+        document.getElementById('budget-prefix').innerText = prefixText;
+        document.getElementById('budget-total').innerText = currentTotal.toFixed(2);
+
+        if (settings.budgetLimit > 0 && currentTotal > settings.budgetLimit) {
+            budgetBar.classList.add('over-budget');
+        } else {
+            budgetBar.classList.remove('over-budget');
+        }
+    }
+
+    // --- STREAMING_CHUNK: Reportes Avanzados y Clonación (Premium Pro) ---
     function archiveCompleted() {
         const completed = items.filter(i => i.completed);
         if (completed.length === 0) return showToast("No hay artículos comprados para archivar.");
@@ -621,12 +864,9 @@
         let total = 0;
         completed.forEach(i => {
             total += ((i.price || 0) * (i.quantity || 1));
-            // Actualizar memoria de precios de lo que efectivamente compramos
-            if (i.price > 0) {
-                priceMemory[i.text.toLowerCase().trim()] = i.price;
-            }
+            if (i.price > 0) priceMemory[i.text.toLowerCase().trim()] = i.price;
         });
-        localStorage.setItem('mercado_prices', JSON.stringify(priceMemory)); // Guardar memoria
+        localStorage.setItem('mercado_prices', JSON.stringify(priceMemory)); 
 
         const sessionId = Date.now();
         const session = {
@@ -649,7 +889,30 @@
         vibrate([50, 100, 50]);
     }
 
-    // --- STREAMING_CHUNK: Reportes Avanzados ---
+    function repeatPurchase(sessionId) {
+        const session = history.find(s => s.id === sessionId);
+        if (!session) return;
+        let added = 0;
+        session.items.forEach(oldItem => {
+            const exists = items.find(i => i.text.toLowerCase() === oldItem.text.toLowerCase() && !i.completed);
+            if (!exists) {
+                items.push({
+                    id: Date.now() + Math.random(),
+                    text: oldItem.text,
+                    category: oldItem.category,
+                    completed: false,
+                    price: priceMemory[oldItem.text.toLowerCase()] || oldItem.price || 0,
+                    quantity: oldItem.quantity || 1,
+                    detail: oldItem.detail || ''
+                });
+                added++;
+            }
+        });
+        saveAndRender();
+        showToast(`${added} productos clonados a tu lista 🛒`);
+        closeModal('reports-modal');
+    }
+
     function openReportsModal() {
         let today = new Date();
         today.setHours(0,0,0,0);
@@ -671,17 +934,15 @@
             if (sessionDate >= startOfYear) tYear += total;
         });
 
-        if (settings.pricesEnabled) {
-            let currentUnarchivedTotal = items
-                .filter(i => i.completed)
-                .reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
-            
-            tAll += currentUnarchivedTotal;
-            tDay += currentUnarchivedTotal;
-            tWeek += currentUnarchivedTotal;
-            tMonth += currentUnarchivedTotal;
-            tYear += currentUnarchivedTotal;
-        }
+        let currentUnarchivedTotal = items
+            .filter(i => i.completed)
+            .reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+        
+        tAll += currentUnarchivedTotal;
+        tDay += currentUnarchivedTotal;
+        tWeek += currentUnarchivedTotal;
+        tMonth += currentUnarchivedTotal;
+        tYear += currentUnarchivedTotal;
 
         document.getElementById('rep-day').innerText = `Bs. ${tDay.toFixed(2)}`;
         document.getElementById('rep-week').innerText = `Bs. ${tWeek.toFixed(2)}`;
@@ -689,9 +950,57 @@
         document.getElementById('rep-year').innerText = `Bs. ${tYear.toFixed(2)}`;
         document.getElementById('rep-all').innerText = `Bs. ${tAll.toFixed(2)}`;
 
+        // Render Recent Tickets for Repeat Purchase
+        const ticketsContainer = document.getElementById('recent-tickets-container');
+        ticketsContainer.innerHTML = '';
+        
+        const recentHistory = [...history].reverse().slice(0, 5); // Últimos 5
+        if(recentHistory.length === 0) {
+            ticketsContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 12px; text-align:center;">No hay tickets en el historial aún.</p>';
+        } else {
+            recentHistory.forEach(session => {
+                const dateStr = new Date(session.date).toLocaleDateString('es-ES', { weekday:'short', day: '2-digit', month: 'short' });
+                const div = document.createElement('div');
+                div.className = 'history-ticket';
+                div.innerHTML = `
+                    <div class="ticket-info">
+                        <span class="ticket-date">${dateStr}</span>
+                        <span class="ticket-details">${session.items.length} artículos | Bs. ${session.total.toFixed(2)}</span>
+                    </div>
+                    <button class="btn-repeat" onclick="repeatPurchase(${session.id})" title="Clonar todos estos artículos a la lista actual">🔄 Clonar</button>
+                `;
+                ticketsContainer.appendChild(div);
+            });
+        }
+
         openModal('reports-modal');
     }
 
+    function clearHistory() {
+        const btn = document.getElementById('btn-clear-history');
+        if (btn.innerText === '🗑️ Borrar Todo el Historial') {
+            btn.innerText = '⚠️ ¿Seguro? Pulsa de nuevo';
+            btn.style.backgroundColor = 'var(--danger)';
+            btn.style.color = 'white';
+            clearConfirmTimer = setTimeout(() => {
+                btn.innerText = '🗑️ Borrar Todo el Historial';
+                btn.style.backgroundColor = '';
+                btn.style.color = 'var(--danger)';
+            }, 3000);
+        } else {
+            clearTimeout(clearConfirmTimer);
+            history = [];
+            localStorage.setItem('mercado_history', JSON.stringify(history));
+            showToast("Historial borrado completamente");
+            btn.innerText = '🗑️ Borrar Todo el Historial';
+            btn.style.backgroundColor = '';
+            btn.style.color = 'var(--danger)';
+            closeModal('reports-modal');
+            openReportsModal(); // Refresh
+        }
+    }
+
+    // --- STREAMING_CHUNK: Exportación Excel (Historial, Stats y Escáner) ---
     function exportReportsToExcel() {
         try {
             const timeframe = document.getElementById('export-timeframe').value;
@@ -785,16 +1094,121 @@
         }
     }
 
-    function clearHistory() {
-        if(confirm("¿Estás seguro de borrar TODO el historial de compras? Esto no se puede deshacer.")) {
-            history = [];
-            localStorage.setItem('mercado_history', JSON.stringify(history));
-            showToast("Historial borrado completamente");
-            closeModal('reports-modal');
+    function exportStatsToExcel() {
+        try {
+            if (items.length === 0) return showToast("No hay artículos para exportar.");
+            
+            const wb = XLSX.utils.book_new();
+            
+            // 1. Hoja de Detalles (Carrito Actual)
+            let cartData = items.map(item => ({
+                "Estado": item.completed ? "COMPRADO ✓" : "PENDIENTE",
+                "Categoría": item.category,
+                "Producto": item.text,
+                "Detalle/Nota": item.detail || "",
+                "Cantidad": item.quantity || 1,
+                "Precio Unitario (Bs.)": item.price || 0,
+                "Total Línea (Bs.)": (item.price || 0) * (item.quantity || 1)
+            }));
+            cartData.sort((a, b) => (a.Estado === "PENDIENTE" ? -1 : 1));
+            
+            const wsCart = XLSX.utils.json_to_sheet(cartData);
+            wsCart['!cols'] = [{wch: 15}, {wch: 25}, {wch: 35}, {wch: 20}, {wch: 10}, {wch: 15}, {wch: 15}];
+            XLSX.utils.book_append_sheet(wb, wsCart, "Detalle Carrito");
+
+            // 2. Hoja de Resumen (Lo mismo que la gráfica)
+            const catCounts = {};
+            const catSpent = {};
+            items.forEach(item => {
+                if (!catCounts[item.category]) { catCounts[item.category] = 0; catSpent[item.category] = 0; }
+                catCounts[item.category] += (item.quantity || 1);
+                if (item.completed) {
+                    catSpent[item.category] += ((item.price || 0) * (item.quantity || 1));
+                }
+            });
+
+            let summaryData = Object.keys(catCounts).map(cat => ({
+                "Categoría": cat,
+                "Artículos en Lista": catCounts[cat],
+                "Dinero Gastado (Bs.)": catSpent[cat]
+            }));
+
+            const totalItems = Object.values(catCounts).reduce((a,b)=>a+b, 0);
+            const totalSpent = Object.values(catSpent).reduce((a,b)=>a+b, 0);
+            summaryData.push({ "Categoría": "TOTAL GENERAL", "Artículos en Lista": totalItems, "Dinero Gastado (Bs.)": totalSpent });
+
+            const wsSummary = XLSX.utils.json_to_sheet(summaryData);
+            wsSummary['!cols'] = [{wch: 30}, {wch: 20}, {wch: 20}];
+            XLSX.utils.book_append_sheet(wb, wsSummary, "Resumen Gráfica");
+
+            const dateStr = new Date().toLocaleDateString('es-ES').replace(/\//g, '-');
+            XLSX.writeFile(wb, `Resumen_Compras_${dateStr}.xlsx`);
+            
+            showToast(`Resumen exportado a Excel 📥`);
+            
+        } catch (error) {
+            showToast("Error al exportar");
+            console.error(error);
         }
     }
 
-    // --- STREAMING_CHUNK: Gráficas y Stats ---
+    function importExcel(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, {type: 'array'});
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonMatrix = XLSX.utils.sheet_to_json(firstSheet, {header: 1, defval: ""});
+            
+            let addedCount = 0;
+            const ignoreWords = ['total', 'efectivo', 'qr', 'tarjetas', 'pago', 'cada uno', 'almacen', 'frutas', 'sobro', 'a granel'];
+
+            for (let row = 0; row < jsonMatrix.length; row++) {
+                for (let col = 0; col < jsonMatrix[row].length; col++) {
+                    let cellVal = String(jsonMatrix[row][col]).trim();
+                    
+                    if (cellVal && isNaN(cellVal) && cellVal.length > 2) {
+                        let isForbidden = ignoreWords.some(w => cellVal.toLowerCase().includes(w));
+                        if(isForbidden) continue;
+
+                        let priceVal = 0;
+                        if (col + 1 < jsonMatrix[row].length) {
+                            let nextCell = jsonMatrix[row][col+1];
+                            if (!isNaN(parseFloat(nextCell)) && parseFloat(nextCell) > 0) {
+                                priceVal = parseFloat(nextCell);
+                            }
+                        }
+
+                        items.push({
+                            id: Date.now() + Math.random(),
+                            text: cellVal,
+                            category: determineCategory(cellVal),
+                            completed: false,
+                            price: priceVal,
+                            quantity: 1,
+                            detail: '📊 Excel'
+                        });
+                        addedCount++;
+                    }
+                }
+            }
+
+            if (addedCount > 0) {
+                saveAndRender();
+                showToast(`${addedCount} productos extraídos del Excel ✅`);
+                vibrate(100);
+            } else {
+                showToast("No se encontraron productos legibles.");
+            }
+        };
+        reader.readAsArrayBuffer(file);
+        e.target.value = ''; 
+    }
+
+    // --- STREAMING_CHUNK: Extras y Asistentes (Gráfica, Voz, WhatsApp, Receta) ---
     function openStatsModal() {
         if (items.length === 0) return showToast("Agrega items para ver estadísticas.");
         
@@ -802,14 +1216,9 @@
         document.getElementById('stat-total-items').innerText = items.length;
         document.getElementById('stat-completed').innerText = completedCount;
         
-        if (settings.pricesEnabled) {
-            document.getElementById('stat-money-box').style.display = 'block';
-            let spent = items.filter(i => i.completed).reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
-            document.getElementById('stat-money').innerText = `Bs. ${spent.toFixed(2)}`;
-        } else {
-            document.getElementById('stat-money-box').style.display = 'none';
-        }
-
+        let spent = items.filter(i => i.completed).reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+        document.getElementById('stat-money').innerText = `Bs. ${spent.toFixed(2)}`;
+        
         renderChart();
         openModal('stats-modal');
     }
@@ -841,328 +1250,26 @@
         });
     }
 
-    function exportStatsToExcel() {
-        try {
-            if (items.length === 0) return showToast("El carrito está vacío.");
-            
-            const wb = XLSX.utils.book_new();
-            
-            let cartData = items.map(item => ({
-                "Estado": item.completed ? "COMPRADO ✓" : "PENDIENTE",
-                "Categoría": item.category,
-                "Producto": item.text,
-                "Detalle/Nota": item.detail || "",
-                "Cantidad": item.quantity || 1,
-                "Precio Unitario (Bs.)": settings.pricesEnabled ? (item.price || 0) : "",
-                "Total Línea (Bs.)": settings.pricesEnabled ? ((item.price || 0) * (item.quantity || 1)) : ""
-            }));
-            
-            cartData.sort((a, b) => (a.Estado === "PENDIENTE" ? -1 : 1));
-            
-            const wsCart = XLSX.utils.json_to_sheet(cartData);
-            wsCart['!cols'] = [{wch: 15}, {wch: 25}, {wch: 35}, {wch: 20}, {wch: 10}, {wch: 15}, {wch: 15}];
-            XLSX.utils.book_append_sheet(wb, wsCart, "Carrito Actual");
-
-            const dateStr = new Date().toLocaleDateString('es-ES').replace(/\//g, '-');
-            XLSX.writeFile(wb, `Mi_Carrito_${dateStr}.xlsx`);
-            
-            showToast(`Carrito exportado a Excel 📥`);
-            
-        } catch (error) {
-            showToast("Error al exportar");
-            console.error(error);
-        }
-    }
-
-    // --- STREAMING_CHUNK: Importación Excel "Escáner Humano" ---
-    function importExcel(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, {type: 'array'});
-            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            const jsonMatrix = XLSX.utils.sheet_to_json(firstSheet, {header: 1, defval: ""});
-            
-            let addedCount = 0;
-            const ignoreWords = ['total', 'efectivo', 'qr', 'tarjetas', 'pago', 'cada uno', 'almacen', 'frutas'];
-
-            for (let row = 0; row < jsonMatrix.length; row++) {
-                for (let col = 0; col < jsonMatrix[row].length; col++) {
-                    let cellVal = String(jsonMatrix[row][col]).trim();
-                    
-                    if (cellVal && isNaN(cellVal) && cellVal.length > 2) {
-                        let isForbidden = ignoreWords.some(w => cellVal.toLowerCase().includes(w));
-                        if(isForbidden) continue;
-
-                        let priceVal = 0;
-                        if (col + 1 < jsonMatrix[row].length) {
-                            let nextCell = jsonMatrix[row][col+1];
-                            if (!isNaN(parseFloat(nextCell))) {
-                                priceVal = parseFloat(nextCell);
-                            }
-                        }
-
-                        items.push({
-                            id: Date.now() + Math.random(),
-                            text: cellVal,
-                            category: determineCategory(cellVal),
-                            completed: false,
-                            price: priceVal,
-                            quantity: 1,
-                            detail: '📊 Excel'
-                        });
-                        addedCount++;
-                    }
-                }
-            }
-
-            if (addedCount > 0) {
-                if(!settings.pricesEnabled && items.some(i => i.price > 0)) {
-                    settings.pricesEnabled = true;
-                    applySettings();
-                }
-                saveAndRender();
-                showToast(`${addedCount} productos extraídos del Excel ✅`);
-                vibrate(100);
-            } else {
-                showToast("No se encontraron productos legibles.");
-            }
-        };
-        reader.readAsArrayBuffer(file);
-        e.target.value = ''; 
-    }
-
-    // --- STREAMING_CHUNK: Edición y Listas ---
-    function openEdit(id) {
-        const item = items.find(i => i.id === id);
-        if(!item) return;
-        document.getElementById('edit-id').value = item.id;
-        document.getElementById('edit-text').value = item.text;
-        document.getElementById('edit-category').value = item.category;
-        document.getElementById('edit-detail').value = item.detail || '';
-        document.getElementById('edit-price').value = item.price || 0;
-        openModal('edit-modal');
-    }
-
-    function saveEdit() {
-        const id = Number(document.getElementById('edit-id').value);
-        const item = items.find(i => i.id === id);
-        if(item) {
-            item.text = document.getElementById('edit-text').value;
-            item.category = document.getElementById('edit-category').value;
-            item.detail = document.getElementById('edit-detail').value;
-            item.price = parseFloat(document.getElementById('edit-price').value) || 0;
-            
-            // Actualizar memoria si editas un precio
-            if (item.price > 0) {
-                priceMemory[item.text.toLowerCase().trim()] = item.price;
-                localStorage.setItem('mercado_prices', JSON.stringify(priceMemory));
-            }
-            
-            saveAndRender();
-        }
-        closeModal('edit-modal');
-    }
-
-    function updateItemField(id, field, value) {
-        const item = items.find(i => i.id === id);
-        if(item) {
-            let num = parseFloat(value);
-            if(isNaN(num) || num < 0) num = field === 'quantity' ? 1 : 0;
-            item[field] = num;
-            
-            // Si modifica el precio directamente en el input rápido, aprenderlo
-            if (field === 'price' && num > 0) {
-                priceMemory[item.text.toLowerCase().trim()] = num;
-                localStorage.setItem('mercado_prices', JSON.stringify(priceMemory));
-            }
-            
-            saveAndRender();
-        }
-    }
-
-    function toggleFavorite(text) {
-        const index = favorites.indexOf(text);
-        if (index > -1) favorites.splice(index, 1);
-        else favorites.push(text);
-        localStorage.setItem('mercado_favorites', JSON.stringify(favorites));
-        renderFavorites();
-        renderList(); 
-        showToast(index > -1 ? "Removido de favoritos" : "Agregado a favoritos");
-    }
-
-    function renderFavorites() {
-        if (favorites.length === 0) {
-            favoritesBar.style.display = 'none';
-            return;
-        }
-        favoritesBar.style.display = 'flex';
-        favoritesBar.innerHTML = '';
-        favorites.forEach(fav => {
-            const div = document.createElement('div');
-            div.className = 'fav-chip';
-            div.innerHTML = `⭐ ${fav}`;
-            div.onclick = () => addItem(fav);
-            favoritesBar.appendChild(div);
-        });
-    }
-
-    function setFilter(f) {
-        currentFilter = f;
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.getElementById(`tab-${f}`).classList.add('active');
-        renderList();
-    }
-
-    function sortListByPrice() {
-        isSortDesc = !isSortDesc;
-        const icon = isSortDesc ? "⬇️" : "⬆️";
-        document.getElementById('sort-icon').innerText = `${icon} Precio`;
-        renderList();
-    }
-
-    function renderList() {
-        listContainer.innerHTML = '';
-        let filteredItems = [...items];
-
-        if (currentFilter === 'pending') filteredItems = filteredItems.filter(i => !i.completed);
-        if (currentFilter === 'completed') filteredItems = filteredItems.filter(i => i.completed);
-
-        if (filteredItems.length === 0) {
-            listContainer.innerHTML = '<div class="empty-state">No hay productos aquí.<br>Agrega algo para empezar. 🛒</div>';
-            updateBudgetUI();
-            return;
-        }
-
-        if (settings.pricesEnabled) {
-            filteredItems.sort((a, b) => isSortDesc ? (b.price||0) - (a.price||0) : (a.price||0) - (b.price||0));
-        }
-
-        const grouped = filteredItems.reduce((acc, item) => {
-            if (!acc[item.category]) acc[item.category] = [];
-            acc[item.category].push(item);
-            return acc;
-        }, {});
-
-        Object.keys(grouped).sort().forEach(category => {
-            const groupDiv = document.createElement('div');
-            groupDiv.className = 'category-group';
-            groupDiv.dataset.category = category;
-            
-            const catInfo = categoriesInfo[category] || categoriesInfo['📦 OTROS'];
-            
-            const header = document.createElement('div');
-            header.className = 'category-header';
-            header.innerHTML = `
-                <div class="category-title"><span style="font-size:20px">${catInfo.icon}</span> ${category}</div>
-                <div style="font-size: 12px; color: var(--text-muted); font-weight: bold;">${grouped[category].length}</div>
-            `;
-            groupDiv.appendChild(header);
-
-            const listDiv = document.createElement('div');
-            listDiv.className = 'sortable-list';
-
-            grouped[category].forEach(item => {
-                const isFav = favorites.includes(item.text);
-                const itemDiv = document.createElement('div');
-                itemDiv.className = `item ${item.completed ? 'completed' : ''}`;
-                itemDiv.dataset.id = item.id;
-                
-                let detailsHTML = '';
-                if(item.detail) detailsHTML += `<span>${item.detail}</span>`;
-
-                itemDiv.innerHTML = `
-                    <div class="item-main" onclick="toggleItem(${item.id}, event)">
-                        <span class="drag-handle">≡</span>
-                        <div class="checkbox"></div>
-                        <div class="item-info">
-                            <div class="item-text">${item.text}</div>
-                            ${detailsHTML ? `<div class="item-details">${detailsHTML}</div>` : ''}
-                        </div>
-                    </div>
-                    <div class="item-actions-container">
-                        <div class="inline-data" onclick="event.stopPropagation()">
-                            <span class="inline-label">Cant:</span>
-                            <input type="number" class="mini-input qty-input" value="${item.quantity || 1}" min="1" onchange="updateItemField(${item.id}, 'quantity', this.value)" onclick="this.select()">
-                            ${settings.pricesEnabled ? `
-                            <span class="inline-label">Bs.</span>
-                            <input type="number" class="mini-input price-input" value="${item.price || 0}" min="0" step="0.5" onchange="updateItemField(${item.id}, 'price', this.value)" onclick="this.select()">
-                            ` : ''}
-                        </div>
-                        <div class="item-actions">
-                            <button class="action-mini-btn fav" onclick="toggleFavorite('${item.text}')">${isFav ? '⭐' : '☆'}</button>
-                            <button class="action-mini-btn edit" onclick="openEdit(${item.id})">✏️</button>
-                            <button class="action-mini-btn delete" onclick="confirmDelete(${item.id})">🗑️</button>
-                        </div>
-                    </div>
-                `;
-                listDiv.appendChild(itemDiv);
-            });
-
-            groupDiv.appendChild(listDiv);
-            listContainer.appendChild(groupDiv);
-
-            new Sortable(listDiv, {
-                group: 'shared',
-                handle: '.drag-handle',
-                animation: 150,
-                onEnd: function (evt) {
-                    const itemEl = evt.item;
-                    const itemId = Number(itemEl.dataset.id);
-                    const newCategory = evt.to.closest('.category-group').dataset.category;
-                    
-                    const item = items.find(i => i.id === itemId);
-                    if(item && item.category !== newCategory) {
-                        item.category = newCategory;
-                        saveAndRender();
-                        vibrate(50);
-                    }
-                }
-            });
-        });
-
-        updateBudgetUI();
-    }
-
-    // --- STREAMING_CHUNK: Presupuesto y WhatsApp ---
-    function updateBudgetUI() {
-        if (!settings.pricesEnabled) {
-            budgetBar.style.display = 'none';
-            return;
-        }
+    function readPendingList() {
+        if (!('speechSynthesis' in window)) return showToast("Tu navegador no soporta lectura de voz.");
+        const pending = items.filter(i => !i.completed);
+        if (pending.length === 0) return showToast("No tienes productos pendientes.");
         
-        budgetBar.style.display = 'block';
+        window.speechSynthesis.cancel(); 
         
-        let currentTotal = 0;
-        let prefixText = "Total de la Lista: Bs. ";
-
-        if (currentFilter === 'all') {
-            currentTotal = items.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
-            prefixText = "Total de la Lista: Bs. ";
-        } else if (currentFilter === 'pending') {
-            currentTotal = items.filter(i => !i.completed).reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
-            prefixText = "Total Pendientes: Bs. ";
-        } else if (currentFilter === 'completed') {
-            currentTotal = items.filter(i => i.completed).reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
-            prefixText = "Total Comprados: Bs. ";
-        }
-
-        budgetBar.innerHTML = `${prefixText}<span id="budget-total">${currentTotal.toFixed(2)}</span>`;
-
-        if (settings.budgetLimit > 0 && currentTotal > settings.budgetLimit) {
-            budgetBar.classList.add('over-budget');
-        } else {
-            budgetBar.classList.remove('over-budget');
-        }
+        let speechText = "Te falta comprar: ";
+        pending.forEach(item => { speechText += `${item.quantity > 1 ? item.quantity : ''} ${item.text}. `; });
+        
+        const msg = new SpeechSynthesisUtterance(speechText);
+        msg.lang = 'es-ES'; msg.rate = 0.9; 
+        window.speechSynthesis.speak(msg);
+        showToast("🔊 Leyendo lista en voz alta...");
     }
 
     function exportToWhatsApp() {
         if(items.length === 0) return showToast("La lista está vacía");
 
-        let msg = "*🛒 MIRCADITO :3*\n\n";
+        let msg = "*🛒 MIWRCADITO :3*\n\n";
         
         const grouped = items.reduce((acc, item) => {
             if (!acc[item.category]) acc[item.category] = [];
@@ -1175,17 +1282,14 @@
             grouped[cat].forEach(item => {
                 let qty = item.quantity || 1;
                 let text = qty > 1 ? `${qty}x ${item.text}` : item.text;
-                if(settings.pricesEnabled && item.price > 0) {
+                if(item.price > 0) {
                     let totalLinea = qty * item.price;
                     text += ` (Bs. ${totalLinea})`;
                 }
                 if(item.detail) text += ` - _${item.detail}_`;
                 
-                if(item.completed) {
-                    msg += `~- ${text}~\n`;
-                } else {
-                    msg += `- ${text}\n`;
-                }
+                if(item.completed) msg += `~- ${text}~\n`;
+                else msg += `- ${text}\n`;
             });
             msg += `\n`;
         });
@@ -1194,67 +1298,6 @@
         window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
     }
 
-    function saveAndRender() {
-        localStorage.setItem('mercado_items', JSON.stringify(items));
-        renderList();
-        updateAISuggestions();
-    }
-
-    // --- STREAMING_CHUNK: Helpers (Toast, Scanner, Receta, Ajustes) ---
-    function showToast(msg, showUndo = false) {
-        const t = document.getElementById('toast');
-        document.getElementById('toast-msg').innerText = msg;
-        document.getElementById('toast-undo').style.display = showUndo ? 'block' : 'none';
-        
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 4000);
-    }
-
-    function undoAction() {
-        if (lastActionType === 'delete_single' && lastDeletedItems.length > 0) {
-            items.push(lastDeletedItems[0]);
-        } 
-        else if (lastActionType === 'archive_completed' && lastDeletedItems.length > 0) {
-            items.push(...lastDeletedItems);
-            if(lastHistorySessionId) {
-                history = history.filter(s => s.id !== lastHistorySessionId);
-                localStorage.setItem('mercado_history', JSON.stringify(history));
-            }
-        }
-        
-        lastDeletedItems = [];
-        lastActionType = '';
-        saveAndRender();
-        document.getElementById('toast').classList.remove('show');
-        vibrate(50);
-    }
-
-    function vibrate(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
-
-    // Scanner
-    function startScanner() {
-        openModal('scanner-modal');
-        if(!html5QrcodeScanner) {
-            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
-            html5QrcodeScanner.render(
-                (decodedText) => {
-                    document.getElementById('scan-result').value = decodedText;
-                    vibrate(100);
-                },
-                (err) => { console.warn(err); }
-            );
-        }
-    }
-    function processScannedCode() {
-        const val = document.getElementById('scan-result').value;
-        if(val) { addItem("Código: " + val); closeModal('scanner-modal'); }
-    }
-    function stopScanner() {
-        if(html5QrcodeScanner) { html5QrcodeScanner.clear(); html5QrcodeScanner = null; }
-        closeModal('scanner-modal');
-    }
-
-    // Generar Receta
     async function generateRecipe() {
         const completedItems = items.filter(i => i.completed).map(i => i.text);
         if (completedItems.length === 0) return showToast("Marca productos como comprados primero.");
@@ -1294,6 +1337,227 @@
         contentDiv.style.display = 'block';
     }
 
+    // --- STREAMING_CHUNK: Utilidades de Sistema (Ajustes, Edición, Animaciones) ---
+    function openEdit(id) {
+        const item = items.find(i => i.id === id);
+        if(!item) return;
+        document.getElementById('edit-id').value = item.id;
+        document.getElementById('edit-text').value = item.text;
+        document.getElementById('edit-category').value = item.category;
+        document.getElementById('edit-detail').value = item.detail || '';
+        document.getElementById('edit-price').value = item.price || 0;
+        openModal('edit-modal');
+    }
+
+    function saveEdit() {
+        const id = Number(document.getElementById('edit-id').value);
+        const item = items.find(i => i.id === id);
+        if(item) {
+            item.text = document.getElementById('edit-text').value;
+            item.category = document.getElementById('edit-category').value;
+            item.detail = document.getElementById('edit-detail').value;
+            item.price = parseFloat(document.getElementById('edit-price').value) || 0;
+            
+            if (item.price > 0) {
+                priceMemory[item.text.toLowerCase().trim()] = item.price;
+                localStorage.setItem('mercado_prices', JSON.stringify(priceMemory));
+            }
+            saveAndRender();
+        }
+        closeModal('edit-modal');
+    }
+
+    function applyDiscount(percent) {
+        const priceInput = document.getElementById('edit-price');
+        let currentPrice = parseFloat(priceInput.value) || 0;
+        if(currentPrice > 0) {
+            let discounted = currentPrice - (currentPrice * (percent / 100));
+            priceInput.value = discounted.toFixed(2);
+            showToast(`Descuento del ${percent}% aplicado 🏷️`);
+        }
+    }
+
+    function generateTicket() {
+        const completed = items.filter(i => i.completed);
+        if (completed.length === 0) return showToast("No hay artículos comprados para el ticket.");
+        
+        document.getElementById('ticket-date').innerText = new Date().toLocaleString('es-ES');
+        let itemsHtml = '';
+        let total = 0;
+        
+        completed.forEach(item => {
+            let qty = item.quantity || 1;
+            let price = item.price || 0;
+            let lineTotal = qty * price;
+            total += lineTotal;
+            
+            // Visual mejorado: Líneas punteadas, textos completos y notas integradas
+            itemsHtml += `<div style="display: flex; justify-content: space-between; margin-bottom: 6px; border-bottom: 1px dotted #ccc; padding-bottom: 4px;">
+                <span style="flex:1; padding-right: 15px; word-break: break-word;">
+                    ${qty}x ${item.text}
+                    ${item.detail ? `<br><span style="font-size: 11px; color: #666; font-style: italic;">(${item.detail})</span>` : ''}
+                </span>
+                <span style="font-weight: bold; white-space: nowrap;">${lineTotal.toFixed(2)}</span>
+            </div>`;
+        });
+        
+        document.getElementById('ticket-items').innerHTML = itemsHtml;
+        document.getElementById('ticket-total').innerText = total.toFixed(2);
+        openModal('ticket-modal');
+    }
+
+    function shareTicket() {
+        const ticketElement = document.getElementById('ticket-capture-area');
+        const btn = document.getElementById('btn-share-ticket');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '⏳ Generando Captura...';
+        btn.disabled = true;
+
+        // 1. Preparar el mensaje de texto ultra-detallado con Markdown para WhatsApp
+        const completed = items.filter(i => i.completed);
+        let textMsg = "*🧾 TICKET DE COMPRA - MIWRCADITO :3*\n";
+        textMsg += `📅 _${document.getElementById('ticket-date').innerText}_\n\n`;
+        textMsg += `*🛒 DETALLE DE ARTÍCULOS:*\n`;
+        
+        let total = 0;
+        completed.forEach(item => {
+            let qty = item.quantity || 1;
+            let price = item.price || 0;
+            let lineTotal = qty * price;
+            total += lineTotal;
+            
+            let lineText = `▪️ ${qty}x *${item.text}*`;
+            if (item.detail) lineText += ` (_${item.detail}_)`;
+            if (price > 0) lineText += ` ➔ *Bs. ${lineTotal.toFixed(2)}*`;
+            textMsg += `${lineText}\n`;
+        });
+        
+        textMsg += `\n💰 *TOTAL PAGADO: Bs. ${total.toFixed(2)}*\n\n`;
+        textMsg += `_¡Organizado con Miwrcadito :3!_ 🛒✨`;
+
+        // 2. Generar la imagen (Canvas)
+        html2canvas(ticketElement, { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], 'ticket_miwrcadito.png', { type: 'image/png' });
+
+                // 3. COPIAR TEXTO AL PORTAPAPELES SIEMPRE (Seguro anti-fallos)
+                try {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = textMsg;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(textArea);
+                } catch(e) { console.log("No se pudo copiar el texto automáticamente."); }
+
+                // 4. Lógica de Compartir (Movil vs PC)
+                let sharedNatively = false;
+                
+                // Si es un celular, intentamos usar la interfaz nativa
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: 'Ticket de Compra',
+                            text: textMsg
+                        });
+                        sharedNatively = true;
+                        showToast("¡Compartido exitosamente! 💬");
+                    } catch (e) {
+                        console.log("Compartir cancelado o fallido", e);
+                    }
+                }
+                
+                // PLAN B: Si falló, lo canceló, o está en una PC (Windows)
+                if (!sharedNatively) {
+                    // Forzar descarga de la imagen
+                    const link = document.createElement('a');
+                    link.download = 'ticket_miwrcadito.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    
+                    showToast("¡Texto copiado! Pégalo en WhatsApp...");
+                    
+                    // Abrir WhatsApp Web con el texto pre-cargado
+                    setTimeout(() => { 
+                        window.open(`https://wa.me/?text=${encodeURIComponent(textMsg)}`, '_blank'); 
+                    }, 1500);
+                }
+
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 'image/png');
+        }).catch(err => {
+            showToast("Error al generar imagen");
+            console.error(err);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    }
+
+    function toggleFavorite(text) {
+        const index = favorites.indexOf(text);
+        if (index > -1) favorites.splice(index, 1);
+        else favorites.push(text);
+        localStorage.setItem('mercado_favorites', JSON.stringify(favorites));
+        renderFavorites();
+        renderList(); 
+        showToast(index > -1 ? "Removido de favoritos" : "Agregado a favoritos");
+    }
+
+    function renderFavorites() {
+        if (favorites.length === 0) { favoritesBar.style.display = 'none'; return; }
+        favoritesBar.style.display = 'flex';
+        favoritesBar.innerHTML = '';
+        favorites.forEach(fav => {
+            const div = document.createElement('div');
+            div.className = 'fav-chip'; div.innerHTML = `⭐ ${fav}`;
+            div.onclick = () => addItem(fav);
+            favoritesBar.appendChild(div);
+        });
+    }
+
+    function applySettings() {
+        if(settings.darkMode) document.body.classList.add('dark-mode');
+        else document.body.classList.remove('dark-mode');
+
+        document.body.classList.remove('theme-ocean', 'theme-purple', 'theme-sunset');
+        if(settings.theme !== 'emerald') document.body.classList.add(`theme-${settings.theme}`);
+
+        document.getElementById('set-dark').checked = settings.darkMode;
+        document.getElementById('set-theme').value = settings.theme;
+        document.getElementById('set-budget-limit').value = settings.budgetLimit || '';
+        document.getElementById('set-wakelock').checked = settings.wakeLockEnabled;
+        document.getElementById('set-apikey').value = settings.apiKey;
+        
+        toggleWakeLock(true);
+    }
+
+    function saveSettings() {
+        settings.darkMode = document.getElementById('set-dark').checked;
+        settings.theme = document.getElementById('set-theme').value;
+        settings.budgetLimit = parseFloat(document.getElementById('set-budget-limit').value) || 0;
+        settings.wakeLockEnabled = document.getElementById('set-wakelock').checked;
+        settings.apiKey = document.getElementById('set-apikey').value.trim();
+        
+        localStorage.setItem('mercado_settings', JSON.stringify(settings));
+        applySettings();
+        saveAndRender(); 
+        closeModal('settings-modal');
+        showToast("Ajustes guardados");
+    }
+
+    async function toggleWakeLock(init = false) {
+        if (!('wakeLock' in navigator)) return;
+        try {
+            if (settings.wakeLockEnabled && !wakeLock) {
+                wakeLock = await navigator.wakeLock.request('screen');
+            } else if (!settings.wakeLockEnabled && wakeLock) {
+                await wakeLock.release(); wakeLock = null;
+            }
+        } catch (err) { console.log(err); }
+    }
+
     function updateAISuggestions() {
         chipsContainer.innerHTML = '';
         const currentText = input.value.toLowerCase().trim();
@@ -1322,58 +1586,39 @@
     input.addEventListener('keypress', e => { if (e.key === 'Enter') addItem(input.value); });
     document.getElementById('btn-add').addEventListener('click', () => addItem(input.value));
 
-    // Ajustes
-    function applySettings() {
-        if(settings.darkMode) document.body.classList.add('dark-mode');
-        else document.body.classList.remove('dark-mode');
-
-        document.body.classList.remove('theme-ocean', 'theme-purple', 'theme-sunset');
-        if(settings.theme !== 'emerald') document.body.classList.add(`theme-${settings.theme}`);
-
-        document.getElementById('set-dark').checked = settings.darkMode;
-        document.getElementById('set-theme').value = settings.theme;
-        document.getElementById('set-prices').checked = settings.pricesEnabled;
-        document.getElementById('set-budget-limit').value = settings.budgetLimit || '';
-        document.getElementById('set-wakelock').checked = settings.wakeLockEnabled;
-        document.getElementById('set-apikey').value = settings.apiKey;
-
-        document.getElementById('budget-limit-group').style.display = settings.pricesEnabled ? 'block' : 'none';
-        
-        toggleWakeLock(true);
+    function saveAndRender() {
+        localStorage.setItem('mercado_items', JSON.stringify(items));
+        renderList(); updateAISuggestions();
     }
 
-    function togglePrices() {
-        settings.pricesEnabled = document.getElementById('set-prices').checked;
-        document.getElementById('budget-limit-group').style.display = settings.pricesEnabled ? 'block' : 'none';
+    function showToast(msg, showUndo = false) {
+        const t = document.getElementById('toast');
+        document.getElementById('toast-msg').innerText = msg;
+        document.getElementById('toast-undo').style.display = showUndo ? 'block' : 'none';
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 4000);
     }
 
-    function saveSettings() {
-        settings.darkMode = document.getElementById('set-dark').checked;
-        settings.theme = document.getElementById('set-theme').value;
-        settings.pricesEnabled = document.getElementById('set-prices').checked;
-        settings.budgetLimit = parseFloat(document.getElementById('set-budget-limit').value) || 0;
-        settings.wakeLockEnabled = document.getElementById('set-wakelock').checked;
-        settings.apiKey = document.getElementById('set-apikey').value.trim();
-        
-        localStorage.setItem('mercado_settings', JSON.stringify(settings));
-        applySettings();
-        saveAndRender(); 
-        closeModal('settings-modal');
-        showToast("Ajustes guardados");
-    }
-
-    async function toggleWakeLock(init = false) {
-        if (!('wakeLock' in navigator)) return;
-        try {
-            if (settings.wakeLockEnabled && !wakeLock) {
-                wakeLock = await navigator.wakeLock.request('screen');
-            } else if (!settings.wakeLockEnabled && wakeLock) {
-                await wakeLock.release();
-                wakeLock = null;
+    function undoAction() {
+        if (lastActionType === 'delete_single' && lastDeletedItems.length > 0) {
+            items.push(lastDeletedItems[0]);
+        } else if (lastActionType === 'archive_completed' && lastDeletedItems.length > 0) {
+            items.push(...lastDeletedItems);
+            if(lastHistorySessionId) {
+                history = history.filter(s => s.id !== lastHistorySessionId);
+                localStorage.setItem('mercado_history', JSON.stringify(history));
             }
-        } catch (err) { console.log(err); }
+        }
+        lastDeletedItems = []; lastActionType = '';
+        saveAndRender();
+        document.getElementById('toast').classList.remove('show');
+        vibrate(50);
     }
 
+    function vibrate(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function openSettings() { openModal('settings-modal'); }
     function populateCategorySelect() {
         const sel = document.getElementById('edit-category');
         sel.innerHTML = '';
@@ -1384,19 +1629,12 @@
         });
     }
 
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-    function openSettings() { openModal('settings-modal'); }
-
-    // Calculadora
     function openCalculator() {
-        if(!settings.pricesEnabled) return;
         document.getElementById('calc-total').innerText = "Bs. " + document.getElementById('budget-total').innerText;
         document.getElementById('calc-payment').value = '';
         document.getElementById('calc-change').innerText = "Bs. 0.00";
         openModal('calc-modal');
     }
-
     function calculateChange() {
         const totalText = document.getElementById('calc-total').innerText;
         const total = parseFloat(totalText.replace('Bs.','').trim());
@@ -1419,6 +1657,26 @@
         }
     }
 
+    function startScanner() {
+        openModal('scanner-modal');
+        if(!html5QrcodeScanner) {
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+            html5QrcodeScanner.render(
+                (decodedText) => { document.getElementById('scan-result').value = decodedText; vibrate(100); },
+                (err) => { console.warn(err); }
+            );
+        }
+    }
+    function processScannedCode() {
+        const val = document.getElementById('scan-result').value;
+        if(val) { addItem("Código: " + val); closeModal('scanner-modal'); }
+    }
+    function stopScanner() {
+        if(html5QrcodeScanner) { html5QrcodeScanner.clear(); html5QrcodeScanner = null; }
+        closeModal('scanner-modal');
+    }
+
+    // Inicializar aplicación
     init();
 </script>
 </body>

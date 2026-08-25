@@ -2,405 +2,190 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#4CAF50" id="meta-theme-color">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mircadito :3</title>
+    
+    <!-- Meta etiquetas para PWA (App Nativa) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Mi Mercado Miwmiwmiw :3</title>
-    
+    <meta name="theme-color" content="#4CAF50" id="theme-color-meta">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+
     <!-- Librerías Externas -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
 
     <style>
         :root {
-            /* Tema Claro por Defecto (Emerald) */
+            /* Tema Emerald (Por defecto) */
             --bg-color: #f4f7f6;
             --card-bg: #ffffff;
-            --primary: #4CAF50;
+            --primary: #107c41; /* Verde Excel */
             --primary-light: #e8f5e9;
             --text-main: #2c3e50;
             --text-muted: #7f8c8d;
+            --danger: #e74c3c;
+            --warning: #f1c40f;
+            --info: #3498db;
             --border-radius: 16px;
-            --shadow: 0 4px 12px rgba(0,0,0,0.05);
-            --danger: #ff5252;
-            --warning: #ffb142;
+            --shadow: 0 4px 6px rgba(0,0,0,0.05);
+            --modal-bg: rgba(0,0,0,0.5);
         }
 
-        [data-theme="dark"] {
+        .dark-mode {
             --bg-color: #121212;
             --card-bg: #1e1e1e;
-            --primary: #81c784;
-            --primary-light: #2e3b32;
+            --primary: #2e7d32;
+            --primary-light: #1b5e20;
             --text-main: #e0e0e0;
-            --text-muted: #a0a0a0;
-            --shadow: 0 4px 12px rgba(0,0,0,0.3);
+            --text-muted: #9e9e9e;
+            --modal-bg: rgba(0,0,0,0.8);
+            --shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
-        [data-theme="ocean"] { --primary: #3498db; --primary-light: #e1f0fa; }
-        [data-theme="ocean"][data-theme-mode="dark"] { --primary: #64b5f6; --primary-light: #1c2a35; }
+        .theme-ocean { --primary: #0277bd; --primary-light: #e1f5fe; }
+        .theme-purple { --primary: #6a1b9a; --primary-light: #f3e5f5; }
+        .theme-sunset { --primary: #e64a19; --primary-light: #fbe9e7; }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        [data-theme="purple"] { --primary: #9b59b6; --primary-light: #f4e8f9; }
-        [data-theme="purple"][data-theme-mode="dark"] { --primary: #ba68c8; --primary-light: #2c1e33; }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 500px;
-            min-height: 100vh;
-            background-color: var(--bg-color);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        header {
-            background-color: var(--card-bg);
-            padding: 20px 20px 15px 20px;
-            border-bottom-left-radius: var(--border-radius);
-            border-bottom-right-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            transition: background-color 0.3s;
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        h1 {
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 700;
-        }
-
-        .top-icons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .icon-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .icon-btn.whatsapp { background-color: #25D366; }
-        .icon-btn.settings { background-color: #7f8c8d; }
-        .icon-btn.chart { background-color: #3498db; }
-        .icon-btn.recipe { background-color: #f39c12; }
-        .icon-btn.excel-btn { background-color: #107c41; } /* Verde Excel */
-        .icon-btn.reports { background-color: #9b59b6; } /* Morado Reportes */
-
-        .tabs {
-            display: flex;
-            background: var(--bg-color);
-            border-radius: 12px;
-            padding: 4px;
-            margin-bottom: 15px;
-        }
-
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 8px 0;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .tab.active {
-            background: var(--card-bg);
-            color: var(--primary);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            padding: 12px 15px;
-            border: 2px solid var(--bg-color);
-            border-radius: 12px;
-            font-size: 16px;
-            outline: none;
-            background: var(--bg-color);
-            color: var(--text-main);
-            transition: all 0.3s;
-        }
-
-        input[type="text"]:focus {
-            border-color: var(--primary);
-            background: var(--card-bg);
-        }
-
-        .btn-add, .btn-mic {
-            border: none;
-            border-radius: 12px;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-
-        .btn-add { background-color: var(--primary); color: white; }
-        .btn-add:active { transform: scale(0.95); }
-
-        .btn-mic { background-color: #3498db; color: white; }
-        .btn-scan { background-color: #9b59b6; color: white; }
-        .btn-mic.recording {
-            background-color: var(--danger);
-            animation: pulse 1.5s infinite;
-        }
-
-        .ai-suggestions {
-            background-color: var(--primary-light);
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 10px;
-        }
-
-        .chips-container {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 5px;
-            scrollbar-width: none;
-            margin-top: 8px;
-        }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; transition: background-color 0.3s, color 0.3s; }
         
-        .chip {
-            background-color: var(--card-bg);
-            color: var(--primary);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            white-space: nowrap;
-            cursor: pointer;
-            border: 1px solid var(--primary);
-            font-weight: 500;
-            transition: all 0.2s;
-        }
+        .app-container { width: 100%; max-width: 600px; min-height: 100vh; display: flex; flex-direction: column; position: relative; }
 
-        .content {
-            padding: 15px;
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 120px;
-        }
+        header { background-color: var(--card-bg); padding: 20px 20px 10px 20px; border-bottom-left-radius: var(--border-radius); border-bottom-right-radius: var(--border-radius); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; transition: background-color 0.3s; }
+        
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        h1 { font-size: 22px; display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--text-main); }
+        
+        .action-btns { display: flex; gap: 8px; }
+        .icon-btn { width: 36px; height: 36px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: transform 0.2s, background-color 0.2s; background-color: var(--primary-light); color: var(--primary); }
+        .icon-btn:active { transform: scale(0.9); }
+        .icon-btn.whatsapp { background-color: #25D366; color: white; }
+        .icon-btn.excel { background-color: #107c41; color: white; }
+        .icon-btn.stats { background-color: #4285F4; color: white; }
+        .icon-btn.reports { background-color: #9c27b0; color: white; }
+        .icon-btn.settings { background-color: #7f8c8d; color: white; }
+        .icon-btn.tts { background-color: #ff9800; color: white; } /* Botón Voz */
 
-        .category-group {
-            margin-bottom: 25px;
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 15px;
-            box-shadow: var(--shadow);
-        }
+        .tabs { display: flex; background: var(--bg-color); border-radius: 12px; padding: 4px; margin-bottom: 15px; }
+        .tab { flex: 1; text-align: center; padding: 8px; border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+        .tab.active { background: var(--card-bg); color: var(--primary); box-shadow: var(--shadow); }
 
-        .category-title {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-        }
+        .input-group { display: flex; gap: 8px; margin-bottom: 15px; }
+        input[type="text"] { flex: 1; padding: 12px 15px; border: 1px solid #e0e0e0; border-radius: 12px; font-size: 16px; outline: none; transition: border-color 0.3s, background-color 0.3s, color 0.3s; background-color: var(--bg-color); color: var(--text-main); }
+        input[type="text"]:focus { border-color: var(--primary); }
+        .dark-mode input[type="text"] { border-color: #333; }
+        
+        .btn { background-color: var(--primary); color: white; border: none; border-radius: 12px; min-width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: transform 0.1s; padding: 0 15px; font-weight: bold;}
+        .btn:active { transform: scale(0.95); }
+        .btn-mic { background-color: #3498db; padding: 0; width: 45px;}
+        .btn-mic.recording { background-color: var(--danger); animation: pulse 1.5s infinite; }
+        .btn-scan { background-color: #9b59b6; padding: 0; width: 45px; }
 
-        .item {
-            background-color: var(--bg-color);
-            padding: 12px 15px;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.3s;
-            border: 1px solid transparent;
-        }
+        .favorites-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 5px; scrollbar-width: none; }
+        .favorites-bar::-webkit-scrollbar { display: none; }
+        .fav-chip { background-color: var(--card-bg); border: 1px solid #e0e0e0; color: var(--text-main); padding: 5px 12px; border-radius: 20px; font-size: 13px; white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: var(--shadow); }
+        .dark-mode .fav-chip { border-color: #333; }
+        .fav-chip:active { transform: scale(0.95); }
 
-        .item.sortable-ghost { opacity: 0.4; border: 2px dashed var(--primary); }
+        .ai-suggestions { background-color: var(--primary-light); padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; transition: background-color 0.3s; }
+        .ai-header { font-size: 13px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 5px; }
+        .chips-container { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .chips-container::-webkit-scrollbar { display: none; }
+        .chip { background-color: var(--card-bg); color: var(--primary); padding: 6px 12px; border-radius: 20px; font-size: 14px; white-space: nowrap; cursor: pointer; border: 1px solid var(--primary); transition: all 0.2s; }
+        .chip:active { background-color: var(--primary); color: white; }
 
-        .item-content {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 1;
-            cursor: pointer;
-        }
+        .budget-bar { background: var(--primary); color: white; padding: 10px 20px; text-align: center; font-weight: bold; font-size: 16px; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; margin-top: -10px; margin-bottom: 15px; position: relative; z-index: 90; display: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .budget-bar.over-budget { background: var(--danger); }
 
-        .drag-handle {
-            color: var(--text-muted);
-            cursor: grab;
-            padding: 5px;
-            font-size: 18px;
-        }
+        .content { padding: 15px; flex: 1; overflow-y: auto; padding-bottom: 100px; }
+        .category-group { margin-bottom: 25px; background: var(--card-bg); border-radius: 16px; padding: 15px; box-shadow: var(--shadow); transition: background-color 0.3s; }
+        .category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--bg-color); padding-bottom: 8px; }
+        .category-title { font-size: 15px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; display: flex; align-items: center; gap: 8px;}
+        
+        .item { background-color: var(--bg-color); padding: 12px; border-radius: 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s; border: 1px solid transparent; flex-direction: column; align-items: stretch; gap: 8px; }
+        .dark-mode .item { border-color: #333; }
+        .item.completed { opacity: 0.6; background-color: transparent; border-color: var(--primary); }
+        .item.sortable-ghost { opacity: 0.4; background-color: var(--primary-light); }
 
-        .checkbox {
-            width: 24px;
-            height: 24px;
-            border: 2px solid var(--primary);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-
+        .item-main { display: flex; align-items: center; gap: 12px; flex: 1; overflow: hidden; cursor: pointer; }
+        .drag-handle { color: var(--text-muted); cursor: grab; padding: 5px; font-size: 20px; }
+        .checkbox { width: 26px; height: 26px; min-width: 26px; border: 2px solid var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .item.completed .checkbox { background-color: var(--primary); }
-        .item.completed .checkbox::after { content: "✓"; color: white; font-weight: bold; }
+        .item.completed .checkbox::after { content: "✓"; color: white; font-weight: bold; font-size: 14px; }
+        
+        .item-info { display: flex; flex-direction: column; flex: 1; }
+        .item-text { font-size: 16px; font-weight: 500; transition: all 0.3s; color: var(--text-main); word-break: break-word;}
         .item.completed .item-text { text-decoration: line-through; color: var(--text-muted); }
+        .item-details { display: flex; gap: 10px; font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
-        .item-details { display: flex; flex-direction: column; }
-        .item-text { font-size: 16px; font-weight: 500; }
-        .item-note { font-size: 12px; color: var(--primary); margin-top: 2px; }
-        .item-price { font-size: 14px; font-weight: bold; color: var(--text-main); margin-left: auto; padding-right: 10px; }
-
-        .actions { display: flex; gap: 10px; align-items: center; }
-        .star-btn { color: #f1c40f; font-size: 20px; background: none; border: none; cursor: pointer; }
-        .star-btn.active { text-shadow: 0 0 5px rgba(241, 196, 15, 0.5); }
-        .delete-btn { color: var(--danger); font-size: 18px; background: none; border: none; cursor: pointer; }
-
-        .bottom-bar {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 450px;
-            background: var(--card-bg);
-            padding: 15px 20px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            display: none;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            border: 2px solid var(--primary);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .bottom-bar:active { transform: translateX(-50%) scale(0.98); }
-
-        .bottom-bar.visible { display: flex; }
-        .total-text { font-size: 14px; color: var(--text-muted); font-weight: 600; }
-        .total-amount { font-size: 22px; font-weight: 800; color: var(--primary); }
-        .total-amount.over-budget { color: var(--danger); }
-
-        .fab-clear {
-            position: fixed;
-            bottom: 90px;
-            right: 20px;
-            background: var(--danger);
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 4px 10px rgba(255, 82, 82, 0.4);
-            border: none;
-            z-index: 90;
-            cursor: pointer;
-        }
-
-        .modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
-        }
+        .item-actions-container { display: flex; justify-content: space-between; align-items: center; padding-left: 38px; }
         
-        .modal.active { display: flex; }
-
-        .modal-content {
-            background: var(--card-bg);
-            width: 90%;
-            max-width: 400px;
-            border-radius: 24px;
-            padding: 25px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 20px; text-align: center; color: var(--primary); }
-        .setting-group { margin-bottom: 20px; }
-        .setting-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-muted); }
-        .setting-group input, .setting-group select { width: 100%; padding: 12px; border: 1px solid var(--bg-color); border-radius: 10px; background: var(--bg-color); color: var(--text-main); }
+        .inline-data { display: flex; align-items: center; gap: 5px; background: var(--primary-light); padding: 4px 10px; border-radius: 12px; transition: opacity 0.3s;}
+        .dark-mode .inline-data { background: rgba(255,255,255,0.05); }
+        .inline-label { font-size: 13px; color: var(--text-muted); font-weight: bold; }
         
-        .modal-btn {
-            width: 100%; padding: 14px; border: none; border-radius: 12px;
-            background: var(--primary); color: white; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px;
-        }
-        .modal-btn.secondary { background: var(--bg-color); color: var(--text-main); }
+        .mini-input { background: var(--card-bg); border: 1px solid rgba(0,0,0,0.1); color: var(--text-main); font-size: 14px; text-align: center; outline: none; padding: 4px 2px; font-weight: bold; width: 45px; transition: all 0.2s; border-radius: 6px;}
+        .dark-mode .mini-input { border-color: rgba(255,255,255,0.1); }
+        .mini-input.price-input { width: 75px; }
+        .mini-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-light); }
+        .item.completed .inline-data { opacity: 0.5; pointer-events: none; }
+        
+        .mini-input::-webkit-outer-spin-button, .mini-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .mini-input[type=number] { -moz-appearance: textfield; }
 
-        .toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: #323232; color: white; padding: 12px 24px; border-radius: 30px;
-            font-size: 14px; display: flex; gap: 15px; align-items: center;
-            opacity: 0; transition: opacity 0.3s; z-index: 2000; pointer-events: none;
-        }
-        .toast.show { opacity: 1; pointer-events: auto; }
-        .toast-undo { color: #ffb142; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .item-actions { display: flex; gap: 5px; }
+        .action-mini-btn { background: none; border: none; color: var(--text-muted); font-size: 18px; padding: 5px; cursor: pointer; transition: color 0.2s; }
+        .action-mini-btn:hover, .action-mini-btn:active { color: var(--primary); }
+        .action-mini-btn.delete:active { color: var(--danger); }
+        .action-mini-btn.fav { color: var(--warning); }
+
+        .fab-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 100; }
+        .fab { width: 56px; height: 56px; border-radius: 50%; border: none; background-color: var(--primary); color: white; font-size: 24px; box-shadow: 0 6px 12px rgba(0,0,0,0.2); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+        .fab:active { transform: scale(0.9); }
+        .fab.sweep { background-color: var(--warning); color: #333; }
+        .fab.recipe { background-color: var(--danger); }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 1000; padding: 20px; backdrop-filter: blur(5px); }
+        .modal.active { opacity: 1; pointer-events: auto; }
+        .modal-content { background: var(--card-bg); width: 100%; max-width: 400px; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; }
+        .modal.active .modal-content { transform: translateY(0); }
+        .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 10px; background: var(--bg-color); color: var(--text-main); font-size: 16px; outline: none; }
+        .dark-mode .form-group input, .dark-mode .form-group select { border-color: #333; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
+        
+        .modal-btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; margin-top: 10px; }
+        .modal-btn.primary { background: var(--primary); color: white; }
+        .modal-btn.secondary { background: var(--bg-color); color: var(--text-main); border: 1px solid #e0e0e0; }
+        .dark-mode .modal-btn.secondary { border-color: #333; }
+        .modal-btn:active { opacity: 0.8; }
+
+        .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--bg-color); }
+        
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        .toast { position: fixed; bottom: -60px; left: 50%; transform: translateX(-50%); background: #323232; color: white; padding: 12px 24px; border-radius: 30px; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 2000; display: flex; align-items: center; gap: 15px; white-space: nowrap;}
+        .toast.show { bottom: 30px; }
+        .toast-undo { color: #ffeb3b; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;}
+
+        #reader { width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 15px; display: none; border: 2px solid var(--primary);}
+        .chart-container { position: relative; height: 250px; width: 100%; margin-bottom: 20px; }
 
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); } 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); } }
-
-        /* Ocultar input de archivo */
-        #excel-file-input { display: none; }
+        .empty-state { text-align: center; color: var(--text-muted); margin-top: 40px; font-size: 16px; padding: 20px;}
+        input[type="file"] { display: none; }
     </style>
 </head>
 <body>
@@ -408,812 +193,472 @@
 <div class="app-container">
     <header>
         <div class="header-top">
-            <h1>🛒 Mi Mercado Miwmiwmiw :3</h1>
-            <div class="top-icons">
-                <!-- Botón oculto para subir excel -->
-                <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv">
-                <button class="icon-btn excel-btn" onclick="document.getElementById('excel-file-input').click()" title="Importar Excel">📁</button>
-                <button class="icon-btn reports" onclick="openReportsModal()" title="Reportes y Exportar">📋</button>
-                
-                <button class="icon-btn recipe" onclick="generateRecipe()" title="Recetas IA">🍳</button>
-                <button class="icon-btn chart" onclick="openStatsModal()" title="Estadísticas">📊</button>
-                <button class="icon-btn settings" onclick="document.getElementById('settings-modal').classList.add('active')" title="Ajustes">⚙️</button>
-                <button class="icon-btn whatsapp" onclick="exportToWhatsApp()" title="Enviar">💬</button>
+            <h1>🛒 Mircadito :3</h1>
+            <div class="action-btns">
+                <!-- Botón de voz (NUEVO) -->
+                <button class="icon-btn tts" onclick="readPendingList()" title="Leer pendientes en voz alta">🔊</button>
+                <label for="file-upload" class="icon-btn excel" title="Cargar Excel">📁</label>
+                <input id="file-upload" type="file" accept=".xlsx, .xls" onchange="importExcel(event)" />
+                <button class="icon-btn stats" onclick="openStatsModal()" title="Estadísticas de la Lista">📊</button>
+                <button class="icon-btn reports" onclick="openReportsModal()" title="Reportes e Historial">📅</button>
+                <button class="icon-btn settings" onclick="openSettings()" title="Ajustes">⚙️</button>
+                <button class="icon-btn whatsapp" onclick="exportToWhatsApp()" title="Enviar por WhatsApp">💬</button>
             </div>
         </div>
 
         <div class="tabs">
-            <div class="tab active" onclick="setFilter('all', this)">Todos</div>
-            <div class="tab" onclick="setFilter('pending', this)">Pendientes</div>
-            <div class="tab" onclick="setFilter('completed', this)">Comprados</div>
-            <div class="tab" style="color: var(--primary);" onclick="sortByPrice()">💲 Ordenar</div>
+            <div class="tab active" id="tab-all" onclick="setFilter('all')">Todos</div>
+            <div class="tab" id="tab-pending" onclick="setFilter('pending')">Pendientes</div>
+            <div class="tab" id="tab-completed" onclick="setFilter('completed')">Comprados</div>
+            <div class="tab" id="tab-sort" onclick="sortListByPrice()" style="color: var(--primary);"><span id="sort-icon">💲 Ordenar</span></div>
         </div>
 
         <div class="input-group">
-            <button class="btn-mic" id="btn-mic" title="Dictar">🎤</button>
-            <button class="btn-mic btn-scan" onclick="openScanner()" title="Escanear Código">📷</button>
+            <button class="btn btn-mic" id="btn-mic" title="Dictar por voz">🎤</button>
+            <button class="btn btn-scan" id="btn-scan" onclick="startScanner()" title="Escanear Código">📷</button>
             <input type="text" id="item-input" placeholder="Escribe o pega texto masivo..." autocomplete="off">
-            <button class="btn-add" id="btn-add">➕</button>
+            <button class="btn" id="btn-add" title="Agregar">+</button>
         </div>
         
-        <div class="chips-container" id="favorites-container" style="display: none; padding-bottom: 10px; border-bottom: 1px dashed var(--primary-light);">
-            <!-- Favoritos -->
-        </div>
+        <div class="favorites-bar" id="favorites-bar" style="display: none;"></div>
 
         <div class="ai-suggestions" id="ai-section">
-            <div style="font-size: 13px; font-weight: bold; color: var(--primary);">✨ Sugerencias Inteligentes:</div>
+            <div class="ai-header">✨ Sugerencias Inteligentes:</div>
             <div class="chips-container" id="chips-container"></div>
         </div>
     </header>
 
-    <div class="content" id="list-container">
-        <!-- Contenido generado por JS -->
+    <div class="budget-bar" id="budget-bar" onclick="openCalculator()">
+        Total en Carrito: Bs.<span id="budget-total">0.00</span>
     </div>
 
-    <!-- Botón flotante para limpiar comprados -->
-    <button class="fab-clear" onclick="clearCompleted()" id="fab-clear" style="display:none;" title="Borrar Completados">🧹</button>
+    <div class="content" id="list-container"></div>
 
-    <!-- Barra de Total (Presupuesto) -->
-    <div class="bottom-bar" id="bottom-bar" onclick="openCheckout()" title="Toca para calcular vuelto">
-        <div class="total-text">Total en Carrito: <br><small style="font-size:10px; font-weight:normal;">(Toca para pagar)</small></div>
-        <div class="total-amount" id="total-amount">$0.00</div>
+    <div class="fab-container">
+        <button class="fab recipe" onclick="generateRecipe()" title="Chef IA (Generar Receta)" id="btn-recipe">🍳</button>
+        <button class="fab sweep" onclick="archiveCompleted()" title="Archivar Comprados al Historial">🧹</button>
+    </div>
+</div>
+
+<!-- Modal Edición -->
+<div class="modal" id="edit-modal">
+    <div class="modal-content">
+        <div class="modal-title">✏️ Editar Producto</div>
+        <input type="hidden" id="edit-id">
+        <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" id="edit-text">
+        </div>
+        <div class="form-group">
+            <label>Categoría</label>
+            <select id="edit-category"></select>
+        </div>
+        <div class="form-group">
+            <label>Nota / Detalle</label>
+            <input type="text" id="edit-detail" placeholder="Ej: Marca, 2 Litros...">
+        </div>
+        <div class="form-group" id="edit-price-group" style="display:none;">
+            <label>Precio (Bs.)</label>
+            <input type="number" id="edit-price" step="0.5" min="0">
+        </div>
+        <button class="modal-btn primary" onclick="saveEdit()">Guardar Cambios</button>
+        <button class="modal-btn secondary" onclick="closeModal('edit-modal')">Cancelar</button>
     </div>
 </div>
 
 <!-- Modal Ajustes -->
 <div class="modal" id="settings-modal">
     <div class="modal-content">
-        <div class="modal-title">⚙️ Ajustes</div>
-        
-        <div class="setting-group">
-            <label>Tema de Color</label>
-            <select id="theme-color" onchange="applySettings()">
-                <option value="emerald">Verde Esmeralda</option>
+        <div class="modal-title">⚙️ Ajustes de la App</div>
+        <div class="setting-row">
+            <span>Tema Oscuro</span>
+            <label class="switch"><input type="checkbox" id="set-dark"><span class="slider"></span></label>
+        </div>
+        <div class="form-group" style="margin-top: 15px;">
+            <label>Color de Acento</label>
+            <select id="set-theme">
+                <option value="emerald">Verde Esmeralda (Defecto)</option>
                 <option value="ocean">Azul Océano</option>
-                <option value="purple">Púrpura</option>
+                <option value="purple">Púrpura Minimalista</option>
+                <option value="sunset">Naranja Sunset</option>
             </select>
         </div>
-        
-        <div class="setting-group" style="display: flex; justify-content: space-between; align-items: center;">
-            <label style="margin:0;">Modo Oscuro</label>
-            <input type="checkbox" id="dark-mode-toggle" style="width:auto; transform: scale(1.5);" onchange="applySettings()">
+        <div class="setting-row">
+            <span>Control de Precios / Presupuesto</span>
+            <label class="switch"><input type="checkbox" id="set-prices" onchange="togglePrices()"><span class="slider"></span></label>
         </div>
-
-        <div class="setting-group" style="display: flex; justify-content: space-between; align-items: center;">
-            <label style="margin:0;">Control de Precios 💲</label>
-            <input type="checkbox" id="prices-toggle" style="width:auto; transform: scale(1.5);" onchange="togglePrices()">
+        <div class="form-group" id="budget-limit-group" style="display:none; margin-top: 10px;">
+            <label>Límite de Presupuesto Máximo (Bs.)</label>
+            <input type="number" id="set-budget-limit" placeholder="Ej. 1500" onchange="updateBudgetUI()">
         </div>
-
-        <div class="setting-group" id="budget-group" style="display: none;">
-            <label>Presupuesto Máximo</label>
-            <input type="number" id="budget-input" placeholder="Ej: 500" onchange="applySettings()">
+        <div class="setting-row">
+            <span>Mantener Pantalla Encendida</span>
+            <label class="switch"><input type="checkbox" id="set-wakelock" onchange="toggleWakeLock()"><span class="slider"></span></label>
         </div>
-        
-        <div class="setting-group">
-            <label>API Key de Google Gemini (Para IA real)</label>
-            <input type="password" id="api-key" placeholder="Pega tu API Key aquí..." onchange="applySettings()">
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 5px;">Déjalo vacío para usar IA local.</div>
+        <div class="form-group" style="margin-top: 15px;">
+            <label>Llave API Gemini (Opcional)</label>
+            <input type="password" id="set-apikey" placeholder="Pega tu API Key de Google aquí...">
+            <small style="color: var(--text-muted); font-size: 11px;">Tus datos se guardan solo en tu dispositivo.</small>
         </div>
-
-        <button class="modal-btn" onclick="document.getElementById('settings-modal').classList.remove('active')">Guardar y Cerrar</button>
+        <button class="modal-btn primary" onclick="saveSettings()">Aplicar Ajustes</button>
     </div>
 </div>
 
-<!-- Modal Edición/Precios -->
-<div class="modal" id="edit-modal">
+<!-- Modal Calculadora Vuelto -->
+<div class="modal" id="calc-modal">
     <div class="modal-content">
-        <div class="modal-title">✏️ Editar Artículo</div>
-        <input type="hidden" id="edit-id">
-        <div class="setting-group">
-            <label>Nombre del Producto</label>
-            <input type="text" id="edit-name">
+        <div class="modal-title">💵 Calculadora de Caja</div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <p style="color: var(--text-muted); font-size: 14px;">Total a Pagar:</p>
+            <h2 style="color: var(--primary); font-size: 36px;" id="calc-total">Bs.0.00</h2>
         </div>
-        <div class="setting-group">
-            <label>Detalle / Cantidad</label>
-            <input type="text" id="edit-detail" placeholder="Ej: 2 kilos, Marca X...">
+        <div class="form-group">
+            <label>¿Con cuánto pagas (Bs.)?</label>
+            <input type="number" id="calc-payment" placeholder="Ej. 100" oninput="calculateChange()" style="font-size: 24px; text-align: center;">
         </div>
-        <div class="setting-group" id="edit-price-group" style="display:none;">
-            <label>Precio</label>
-            <input type="number" id="edit-price" placeholder="0.00" step="0.01">
+        <div style="text-align: center; margin-top: 20px; padding: 15px; background: var(--primary-light); border-radius: 12px;">
+            <p style="color: var(--text-muted); font-size: 14px;">Tu vuelto será:</p>
+            <h2 style="color: var(--text-main); font-size: 28px;" id="calc-change">Bs.0.00</h2>
         </div>
-        <button class="modal-btn" onclick="saveEdit()">Guardar Cambios</button>
-        <button class="modal-btn secondary" onclick="document.getElementById('edit-modal').classList.remove('active')">Cancelar</button>
+        <button class="modal-btn secondary" onclick="closeModal('calc-modal')">Cerrar</button>
     </div>
 </div>
 
-<!-- Modal Reportes e Historial -->
-<div class="modal" id="reports-modal">
-    <div class="modal-content" style="max-width: 450px;">
-        <div class="modal-title">📋 Historial y Reportes</div>
-        
-        <div style="background: var(--bg-color); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--card-bg);">
-                <span style="color: var(--text-muted); font-size: 14px;">Gasto de Hoy:</span>
-                <strong style="color: var(--primary); font-size: 16px;" id="rep-day">$0.00</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--card-bg);">
-                <span style="color: var(--text-muted); font-size: 14px;">Gasto de la Semana:</span>
-                <strong style="color: var(--primary); font-size: 16px;" id="rep-week">$0.00</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--card-bg);">
-                <span style="color: var(--text-muted); font-size: 14px;">Gasto del Mes:</span>
-                <strong style="color: var(--primary); font-size: 16px;" id="rep-month">$0.00</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between;">
-                <span style="color: var(--text-muted); font-size: 14px;">Total Histórico:</span>
-                <strong style="color: var(--primary); font-size: 16px;" id="rep-all">$0.00</strong>
-            </div>
+<!-- Modal Receta IA -->
+<div class="modal" id="recipe-modal">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-title">👨‍🍳 Chef Miwmiwmiw</div>
+        <div id="recipe-loading" style="display: none; text-align: center; padding: 20px;">
+            <div style="font-size: 30px; animation: pulse 1s infinite;">🍳</div>
+            <p style="margin-top: 10px; color: var(--text-muted);">Pensando una receta deliciosa...</p>
         </div>
+        <div id="recipe-content" style="line-height: 1.5; font-size: 15px; white-space: pre-wrap;"></div>
+        <button class="modal-btn secondary" onclick="closeModal('recipe-modal')">Cerrar</button>
+    </div>
+</div>
 
-        <button class="modal-btn" style="background-color: #107c41; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="exportReportsToExcel()">
-            <span>📥</span> Exportar a Excel
-        </button>
-        <button class="modal-btn secondary" style="color: var(--danger); margin-top: 10px;" onclick="clearHistory()">🗑️ Borrar Historial</button>
-        <button class="modal-btn secondary" onclick="document.getElementById('reports-modal').classList.remove('active')">Cerrar</button>
+<!-- Modal Scanner -->
+<div class="modal" id="scanner-modal">
+    <div class="modal-content">
+        <div class="modal-title">📷 Escanear Producto</div>
+        <div id="reader"></div>
+        <div class="form-group" style="margin-top: 15px;">
+            <label>Código Leído:</label>
+            <input type="text" id="scan-result" readonly>
+        </div>
+        <button class="modal-btn primary" id="btn-process-scan" onclick="processScannedCode()">Añadir a Lista</button>
+        <button class="modal-btn secondary" onclick="stopScanner()">Cancelar</button>
     </div>
 </div>
 
 <!-- Modal Estadísticas y Gráfica -->
 <div class="modal" id="stats-modal">
     <div class="modal-content" style="max-width: 450px;">
-        <div class="modal-title">📊 Resumen de Compras</div>
-        <div style="display: flex; justify-content: space-around; margin-bottom: 20px; text-align: center;">
+        <div class="modal-title" style="justify-content: center;">📊 Resumen de Compras</div>
+        <div style="display: flex; justify-content: space-around; text-align: center; margin-bottom: 20px; flex-wrap: wrap;">
             <div>
-                <div style="font-size: 24px; font-weight: bold; color: var(--primary);" id="stat-total">0</div>
+                <strong style="font-size: 24px; color: var(--primary);" id="stat-total-items">0</strong>
                 <div style="font-size: 12px; color: var(--text-muted);">Artículos</div>
             </div>
             <div>
-                <div style="font-size: 24px; font-weight: bold; color: var(--primary);" id="stat-done">0</div>
+                <strong style="font-size: 24px; color: var(--primary);" id="stat-completed">0</strong>
                 <div style="font-size: 12px; color: var(--text-muted);">Comprados</div>
             </div>
-            <div id="stat-money-container" style="display:none;">
-                <div style="font-size: 24px; font-weight: bold; color: var(--primary);" id="stat-money">$0</div>
+            <div id="stat-money-box" style="display: none;">
+                <strong style="font-size: 24px; color: var(--primary);" id="stat-money">Bs.0.00</strong>
                 <div style="font-size: 12px; color: var(--text-muted);">Gastado</div>
             </div>
         </div>
         
-        <!-- Contenedor del Gráfico de Dona -->
-        <div style="position: relative; height:250px; width:100%; margin-bottom: 20px;">
+        <div class="chart-container">
             <canvas id="categoryChart"></canvas>
         </div>
 
-        <button class="modal-btn" onclick="document.getElementById('stats-modal').classList.remove('active')">Cerrar</button>
+        <button class="modal-btn" style="background-color: #107c41; color: white; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="exportStatsToExcel()">
+            <span>📥</span> Exportar Carrito a Excel
+        </button>
+        <button class="modal-btn secondary" onclick="closeModal('stats-modal')">Cerrar</button>
     </div>
 </div>
 
-<!-- Modal Escáner -->
-<div class="modal" id="scanner-modal">
-    <div class="modal-content">
-        <div class="modal-title">📷 Escanear Producto</div>
-        <div id="reader" style="width: 100%; min-height: 250px; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 15px;"></div>
-        <button class="modal-btn secondary" onclick="closeScanner()">Cancelar</button>
+<!-- Modal Reportes e Historial -->
+<div class="modal" id="reports-modal">
+    <div class="modal-content" style="max-width: 450px;">
+        <div class="modal-title">📅 Reportes e Historial</div>
+        
+        <div style="background: var(--bg-color); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--card-bg);">
+                <span style="color: var(--text-muted); font-size: 14px;">Gasto de Hoy:</span>
+                <strong style="color: var(--primary); font-size: 16px;" id="rep-day">Bs.0.00</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--card-bg);">
+                <span style="color: var(--text-muted); font-size: 14px;">Esta Semana:</span>
+                <strong style="color: var(--primary); font-size: 16px;" id="rep-week">Bs.0.00</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--card-bg);">
+                <span style="color: var(--text-muted); font-size: 14px;">Este Mes:</span>
+                <strong style="color: var(--primary); font-size: 16px;" id="rep-month">Bs.0.00</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--card-bg);">
+                <span style="color: var(--text-muted); font-size: 14px;">Este Año:</span>
+                <strong style="color: var(--primary); font-size: 16px;" id="rep-year">Bs.0.00</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-weight: bold;">
+                <span style="color: var(--text-main); font-size: 14px;">Total Histórico:</span>
+                <strong style="color: var(--primary); font-size: 16px;" id="rep-all">Bs.0.00</strong>
+            </div>
+        </div>
+
+        <div style="background: var(--bg-color); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+            <label style="font-size: 14px; font-weight: bold; color: var(--text-main); display: block; margin-bottom: 10px;">Exportar Historial (Excel 📊)</label>
+            <select id="export-timeframe" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--card-bg); margin-bottom: 12px; background: var(--card-bg); color: var(--text-main); outline: none;">
+                <option value="day">Reporte de Hoy</option>
+                <option value="week">Reporte de Esta Semana</option>
+                <option value="month" selected>Reporte de Este Mes</option>
+                <option value="year">Reporte de Este Año</option>
+                <option value="all">Reporte Histórico Completo</option>
+            </select>
+            <button class="modal-btn" style="background-color: #107c41; color: white; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="exportReportsToExcel()">
+                <span>📥</span> Descargar Reporte Detallado
+            </button>
+        </div>
+
+        <button class="modal-btn secondary" style="color: var(--danger); margin-top: 10px; border-color: var(--danger);" onclick="clearHistory()">🗑️ Borrar Todo el Historial</button>
+        <button class="modal-btn secondary" onclick="closeModal('reports-modal')">Cerrar</button>
     </div>
 </div>
 
-<!-- Modal Calculadora de Vuelto -->
-<div class="modal" id="checkout-modal">
-    <div class="modal-content">
-        <div class="modal-title">💵 Pagar en Caja</div>
-        <div style="text-align: center; margin-bottom: 20px;">
-            <div style="font-size: 14px; color: var(--text-muted);">Total a pagar:</div>
-            <div style="font-size: 32px; font-weight: bold; color: var(--primary);" id="checkout-total">$0.00</div>
-        </div>
-        <div class="setting-group">
-            <label>¿Con cuánto pagas? (Efectivo)</label>
-            <input type="number" id="checkout-payment" placeholder="Ej: 100" oninput="calculateChange()">
-        </div>
-        <div style="text-align: center; margin-bottom: 20px; padding: 15px; background: var(--bg-color); border-radius: 12px;">
-            <div style="font-size: 14px; color: var(--text-muted);">Tu cambio será:</div>
-            <div style="font-size: 24px; font-weight: bold; color: var(--text-main);" id="checkout-change">$0.00</div>
-        </div>
-        <button class="modal-btn" onclick="document.getElementById('checkout-modal').classList.remove('active')">Cerrar</button>
-    </div>
-</div>
-
-<!-- Modal Recetas -->
-<div class="modal" id="recipe-modal">
-    <div class="modal-content">
-        <div class="modal-title">🍳 Receta Mágica</div>
-        <div id="recipe-content" style="font-size: 14px; line-height: 1.5; color: var(--text-main); margin-bottom: 20px; white-space: pre-wrap;">
-            Generando idea...
-        </div>
-        <button class="modal-btn" onclick="document.getElementById('recipe-modal').classList.remove('active')">¡A cocinar!</button>
-    </div>
-</div>
-
-<!-- Toast -->
 <div class="toast" id="toast">
     <span id="toast-msg">Acción realizada</span>
-    <span class="toast-undo" id="toast-undo" style="display:none;">Deshacer</span>
+    <span class="toast-undo" id="toast-undo" style="display:none;" onclick="undoAction()">Deshacer</span>
 </div>
 
 <script>
-    // --- ESTADO GLOBAL ---
-    let items = JSON.parse(localStorage.getItem('mercado_items_pro')) || [];
-    let currentFilter = 'all';
-    let isPricesEnabled = localStorage.getItem('mercado_prices') === 'true';
-    let budgetLimit = parseFloat(localStorage.getItem('mercado_budget')) || 0;
-    let html5QrcodeScanner = null;
+    // --- ESTADO DE LA APLICACIÓN ---
+    const APP_VERSION = "3.0";
+    let items = JSON.parse(localStorage.getItem('mercado_items')) || [];
+    let history = JSON.parse(localStorage.getItem('mercado_history')) || [];
+    let favorites = JSON.parse(localStorage.getItem('mercado_favorites')) || [];
+    // NUEVO: Memoria fotográfica de precios
+    let priceMemory = JSON.parse(localStorage.getItem('mercado_prices')) || {}; 
     
-    // Sistema Deshacer
-    let deletedCache = []; 
-    let toastTimeout;
+    let settings = JSON.parse(localStorage.getItem('mercado_settings')) || {
+        darkMode: false,
+        theme: 'emerald',
+        pricesEnabled: true,
+        budgetLimit: 0,
+        wakeLockEnabled: false,
+        apiKey: ''
+    };
     
-    // Gráfico
-    let myChart = null;
+    if (settings.pricesEnabled === false && !localStorage.getItem('precios_forzados_v2')) {
+        settings.pricesEnabled = true;
+        localStorage.setItem('precios_forzados_v2', 'true');
+        localStorage.setItem('mercado_settings', JSON.stringify(settings));
+    }
 
-    // --- CATEGORÍAS (Para Orden y Chart) ---
-    const categories = {
-        '🍎 FRUTAS Y VERDURAS': ['tomate', 'cebolla', 'papa', 'zanahoria', 'limón', 'manzana', 'platano', 'lechuga', 'ajo', 'fruta', 'verdura', 'apio', 'espinaca', 'pimenton', 'zapallo', 'haba', 'arveja', 'vainitas', 'palta'],
-        '🥩 CARNES Y PROTEÍNAS': ['carne', 'pollo', 'pescado', 'cerdo', 'hamburguesa', 'salchicha', 'atún', 'milanesas', 'corazones', 'sardinas'],
-        '🥛 LÁCTEOS Y HUEVOS': ['leche', 'queso', 'huevo', 'huevos', 'yogurt', 'mantequilla', 'crema'],
-        '🍞 DESPENSA': ['arroz', 'fideo', 'pasta', 'azúcar', 'sal', 'aceite', 'pan', 'harina', 'cereal', 'galletas', 'café', 'te', 'avena', 'almendra', 'condimentos', 'mayonesa', 'mostaza', 'ketchup'],
-        '🧼 LIMPIEZA Y HOGAR': ['jabón', 'detergente', 'papel', 'lavavajillas', 'shampoo', 'esponja', 'basura', 'limpiador', 'desodorante'],
+    let currentFilter = 'all';
+    let isSortDesc = true;
+    let wakeLock = null;
+    let html5QrcodeScanner = null;
+    let chartInstance = null;
+    
+    // Variables de Deshacer
+    let lastDeletedItems = [];
+    let lastActionType = ''; 
+    let lastHistorySessionId = null;
+
+    // --- BASE DE DATOS LOCAL ---
+    const categoriesInfo = {
+        '🍎 FRUTAS Y VERDURAS': { keys: ['tomate', 'cebolla', 'papa', 'zanahoria', 'limón', 'manzana', 'platano', 'lechuga', 'ajo', 'fruta', 'verdura', 'aguacate', 'cilantro', 'pimiento', 'brocoli', 'espinaca', 'apio', 'zapallo', 'arveja', 'haba', 'vainitas', 'palta', 'uva', 'fresa', 'naranja', 'pera', 'durazno', 'sandia', 'melon', 'papaya', 'piña', 'champiñon'], icon: '🍎', color: '#4CAF50' },
+        '🥩 CARNES Y PROTEÍNAS': { keys: ['carne', 'pollo', 'pescado', 'cerdo', 'hamburguesa', 'salchicha', 'atún', 'bistec', 'molida', 'chuleta', 'camarón', 'pechuga', 'corazones', 'milanesas', 'sardinas', 'chorizo', 'tocino', 'jamon', 'mortadela'], icon: '🥩', color: '#F44336' },
+        '🥛 LÁCTEOS Y HUEVOS': { keys: ['leche', 'queso', 'huevo', 'huevos', 'yogurt', 'mantequilla', 'crema', 'margarina', 'leches', 'yogur', 'requeson'], icon: '🥛', color: '#9E9E9E' },
+        '🍞 DESPENSA': { keys: ['arroz', 'fideo', 'pasta', 'azúcar', 'sal', 'aceite', 'pan', 'harina', 'cereal', 'galletas', 'café', 'te', 'té', 'salsa', 'frijol', 'lenteja', 'avena', 'mermelada', 'mayonesa', 'ketchup', 'mostaza', 'condimentos', 'almendra', 'maria', 'pimienta', 'comino', 'oregano', 'vinagre', 'sopa', 'atun', 'consome'], icon: '🍞', color: '#FFC107' },
+        '🧼 LIMPIEZA Y HOGAR': { keys: ['jabón', 'detergente', 'papel', 'lavavajillas', 'shampoo', 'esponja', 'basura', 'limpiador', 'cloro', 'suavizante', 'pasta dental', 'desodorante', 'orquillas', 'escoba', 'trapeador', 'servilletas', 'jabon'], icon: '🧼', color: '#03A9F4' },
+        '📦 OTROS': { keys: [], icon: '📦', color: '#9C27B0' }
     };
 
     const smartSuggestionsDB = [
-        { trigger: ['pasta', 'fideo'], suggest: ['Salsa de Tomate', 'Queso Parmesano', 'Carne Molida'] },
-        { trigger: ['carne', 'pollo'], suggest: ['Arroz', 'Papas', 'Carbón', 'Ensalada'] },
-        { trigger: ['leche'], suggest: ['Cereal', 'Café', 'Galletas', 'Pan'] },
-        { trigger: ['pan'], suggest: ['Jamón', 'Queso', 'Mantequilla', 'Mermelada'] },
-        { trigger: ['huevos'], suggest: ['Tocino', 'Aceite', 'Sal', 'Pan'] },
-        { trigger: 'default', suggest: ['Manzana', 'Cebolla', 'Tomate', 'Huevos', 'Papel Higiénico', 'Aceite', 'Arroz', 'Leche'] }
+        { trigger: ['pasta', 'fideo', 'macarron'], suggest: ['Salsa de tomate', 'Queso rallado', 'Carne Molida', 'Albahaca'] },
+        { trigger: ['carne', 'pollo', 'cerdo'], suggest: ['Papas', 'Arroz', 'Carbón', 'Cerveza', 'Ajo', 'Limón'] },
+        { trigger: ['leche', 'leches'], suggest: ['Cereal', 'Café', 'Galletas', 'Pan', 'Azúcar'] },
+        { trigger: ['detergente', 'jabon'], suggest: ['Suavizante', 'Cloro', 'Esponjas', 'Bolsas de basura'] },
+        { trigger: ['pan'], suggest: ['Mantequilla', 'Mermelada', 'Jamón', 'Queso', 'Huevos'] },
+        { trigger: ['papa', 'papas'], suggest: ['Aceite', 'Mayonesa', 'Ketchup'] }
     ];
 
-    // --- FUNCIONES CORE ---
+    const fallbackSuggestions = ['Manzana', 'Huevos', 'Leche', 'Pan Integral', 'Papel Higiénico', 'Aceite de Oliva', 'Cebolla', 'Tomate', 'Jabón', 'Arroz'];
+
+    // --- ELEMENTOS DEL DOM ---
+    const input = document.getElementById('item-input');
+    const listContainer = document.getElementById('list-container');
+    const chipsContainer = document.getElementById('chips-container');
+    const budgetBar = document.getElementById('budget-bar');
+    const favoritesBar = document.getElementById('favorites-bar');
+
+    // --- INICIALIZACIÓN ---
+    function init() {
+        applySettings();
+        populateCategorySelect();
+        renderList();
+        renderFavorites();
+        updateAISuggestions();
+    }
+
+    // --- STREAMING_CHUNK: Lógica de Lista y Agregar ---
     function determineCategory(itemName) {
         const lowerName = itemName.toLowerCase();
-        for (const [category, keywords] of Object.entries(categories)) {
-            if (keywords.some(kw => lowerName.includes(kw))) {
-                return category;
-            }
+        for (const [category, data] of Object.entries(categoriesInfo)) {
+            if (category === '📦 OTROS') continue;
+            if (data.keys.some(kw => lowerName.includes(kw))) return category;
         }
         return '📦 OTROS';
     }
 
-    function saveAndRender() {
-        localStorage.setItem('mercado_items_pro', JSON.stringify(items));
-        renderList();
-        updateFavorites();
-        updateBottomBar();
-        updateAISuggestions(document.getElementById('item-input').value);
-    }
-
-    function addItem(text) {
-        if (!text.trim()) return;
+    function processMassiveInput(text) {
+        const separators = /[,\n]|\by\b/i;
+        const rawItems = text.split(separators).map(i => i.trim()).filter(i => i.length > 1);
         
-        // Soporte Masivo (Pegar lista separada por comas o saltos)
-        const newItems = text.split(/,|\n/).map(s => s.trim()).filter(s => s.length > 0);
-        
-        newItems.forEach(name => {
-            items.push({
-                id: Date.now() + Math.random(),
-                text: name,
-                category: determineCategory(name),
-                completed: false,
-                detail: '',
-                price: 0,
-                starred: false
+        if (rawItems.length > 1) {
+            rawItems.forEach(name => {
+                // Asignar precio de memoria si existe
+                const defaultPrice = priceMemory[name.toLowerCase().trim()] || 0;
+                items.push({ id: Date.now() + Math.random(), text: name, category: determineCategory(name), completed: false, price: defaultPrice, quantity: 1, detail: '' });
             });
-        });
-        
-        document.getElementById('item-input').value = '';
-        saveAndRender();
-        if (navigator.vibrate) navigator.vibrate(50);
+            showToast(`${rawItems.length} artículos añadidos masivamente`);
+            return true;
+        }
+        return false;
     }
 
-    // --- EL SUPER LECTOR DE EXCEL ---
-    document.getElementById('excel-file-input').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
+    function addItem(name) {
+        if (!name.trim()) return;
+        
+        if (processMassiveInput(name)) {
+            input.value = '';
+            saveAndRender();
+            return;
+        }
 
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                
-                // header: 1 convierte la hoja en una matriz bidimensional (Array de Arrays)
-                const rows = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: null});
-                
-                let importCount = 0;
-                // Palabras de sumatorias y contabilidad que no son productos de mercado
-                const ignoredWords = ['total', 'efectivo', 'cada uno', 'pago rodrigo', 'por pagar', 'a granel', 'frutas', 'sobro', 'almacen', 'tarjetas', 'qr', 'taxi'];
+        const cleanName = name.trim();
+        const defaultPrice = priceMemory[cleanName.toLowerCase()] || 0;
 
-                // Escanear como humano: Fila por fila, de izquierda a derecha
-                rows.forEach(row => {
-                    for (let i = 0; i < row.length - 1; i++) {
-                        let cellVal = row[i];
-                        let nextCellVal = row[i+1];
-                        
-                        // Si la celda actual es un Texto...
-                        if (cellVal && typeof cellVal === 'string' && cellVal.trim() !== '') {
-                            const lowerText = cellVal.toLowerCase().trim();
-                            
-                            // Ignorar si es una palabra de sistema
-                            if (ignoredWords.some(w => lowerText === w || lowerText.includes(w))) continue;
-                            
-                            // Mirar la celda a la DERECHA. ¿Es un precio?
-                            let priceVal = parseFloat(nextCellVal);
-                            
-                            if (!isNaN(priceVal) && priceVal > 0) {
-                                // ¡Encontramos un par válido!
-                                items.push({
-                                    id: Date.now() + Math.random(),
-                                    text: cellVal.trim(),
-                                    category: determineCategory(cellVal),
-                                    completed: false,
-                                    detail: '📊 Excel',
-                                    price: priceVal,
-                                    starred: false
-                                });
-                                importCount++;
-                                i++; // Saltamos una celda para no volver a leer este número
-                            }
-                        }
-                    }
-                });
-
-                if (importCount > 0) {
-                    if (!isPricesEnabled) {
-                        document.getElementById('prices-toggle').checked = true;
-                        togglePrices(); 
-                    } else {
-                        saveAndRender();
-                    }
-                    showToast(`Éxito: Se importaron ${importCount} artículos`);
-                    if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
-                } else {
-                    showToast("No se encontraron precios junto a textos en el Excel.");
-                }
-            } catch (error) {
-                showToast("Error al leer el archivo Excel");
-                console.error(error);
-            }
-            document.getElementById('excel-file-input').value = ""; // Reset
+        const newItem = {
+            id: Date.now(),
+            text: cleanName,
+            category: determineCategory(cleanName),
+            completed: false,
+            price: defaultPrice,
+            quantity: 1,
+            detail: ''
         };
-        reader.readAsArrayBuffer(file);
-    });
+        items.push(newItem);
+        input.value = '';
+        saveAndRender();
+        vibrate(50);
+    }
 
-    function toggleItem(id) {
+    function toggleItem(id, event) {
+        if(event && (event.target.tagName === 'BUTTON' || event.target.tagName === 'INPUT' || (event.target.tagName === 'SPAN' && event.target.parentElement.tagName === 'BUTTON'))) return;
+        
         const item = items.find(i => i.id === id);
         if (item) {
             item.completed = !item.completed;
-            if (item.completed && navigator.vibrate) navigator.vibrate(30);
+            saveAndRender();
+            vibrate(item.completed ? [50, 50] : 50);
             
-            // Confeti si todos están completados
-            const pending = items.filter(i => !i.completed).length;
-            if (pending === 0 && items.length > 0 && item.completed) {
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            if (item.completed && items.every(i => i.completed) && items.length > 0) {
+                shootConfetti();
             }
-            saveAndRender();
         }
     }
 
-    function deleteItem(id) {
-        const idx = items.findIndex(i => i.id === id);
-        if (idx > -1) {
-            deletedCache = [items[idx]];
-            items.splice(idx, 1);
+    function confirmDelete(id) {
+        const itemIndex = items.findIndex(i => i.id === id);
+        if (itemIndex > -1) {
+            lastDeletedItems = [items[itemIndex]];
+            lastActionType = 'delete_single';
+            items.splice(itemIndex, 1);
             saveAndRender();
-            showToast("Artículo eliminado", true);
-            if (navigator.vibrate) navigator.vibrate([30, 30]);
-        }
-    }
-    
-    function toggleStar(id, event) {
-        event.stopPropagation();
-        const item = items.find(i => i.id === id);
-        if (item) {
-            item.starred = !item.starred;
-            saveAndRender();
+            showToast("Producto eliminado", true);
+            vibrate(100);
         }
     }
 
-    function openEdit(id) {
-        const item = items.find(i => i.id === id);
-        if (!item) return;
-        
-        document.getElementById('edit-id').value = item.id;
-        document.getElementById('edit-name').value = item.text;
-        document.getElementById('edit-detail').value = item.detail || '';
-        
-        if (isPricesEnabled) {
-            document.getElementById('edit-price-group').style.display = 'block';
-            document.getElementById('edit-price').value = item.price || '';
-        } else {
-            document.getElementById('edit-price-group').style.display = 'none';
-        }
-        
-        document.getElementById('edit-modal').classList.add('active');
-    }
-
-    function saveEdit() {
-        const id = parseFloat(document.getElementById('edit-id').value);
-        const item = items.find(i => i.id === id);
-        if (item) {
-            item.text = document.getElementById('edit-name').value;
-            item.detail = document.getElementById('edit-detail').value;
-            if (isPricesEnabled) {
-                item.price = parseFloat(document.getElementById('edit-price').value) || 0;
-            }
-            // Recategorizar por si cambió el nombre
-            item.category = determineCategory(item.text);
-            saveAndRender();
-        }
-        document.getElementById('edit-modal').classList.remove('active');
-    }
-
-    function sortByPrice() {
-        if(!isPricesEnabled) {
-            showToast("Activa los precios en Ajustes primero");
+    // --- STREAMING_CHUNK: Voz y Text-to-Speech ---
+    function readPendingList() {
+        if (!('speechSynthesis' in window)) {
+            showToast("Tu navegador no soporta lectura de voz.");
             return;
         }
-        // Orden descendente por precio
-        items.sort((a, b) => (b.price || 0) - (a.price || 0));
-        saveAndRender();
-        showToast("Lista ordenada por precio mayor");
-    }
-
-    function renderList() {
-        const container = document.getElementById('list-container');
-        container.innerHTML = '';
         
-        const filteredItems = items.filter(item => {
-            if (currentFilter === 'pending') return !item.completed;
-            if (currentFilter === 'completed') return item.completed;
-            return true;
-        });
-
-        if (filteredItems.length === 0) {
-            container.innerHTML = `<div style="text-align:center; color:var(--text-muted); margin-top:40px;">No hay artículos aquí. 🛒</div>`;
-            document.getElementById('fab-clear').style.display = 'none';
+        const pending = items.filter(i => !i.completed);
+        if (pending.length === 0) {
+            showToast("No tienes productos pendientes.");
             return;
         }
-
-        const hasCompleted = filteredItems.some(i => i.completed);
-        document.getElementById('fab-clear').style.display = hasCompleted ? 'flex' : 'none';
-
-        // Orden de Categorías basado en el objeto original
-        const catOrder = Object.keys(categories);
-        catOrder.push('📦 OTROS');
-
-        const grouped = filteredItems.reduce((acc, item) => {
-            if (!acc[item.category]) acc[item.category] = [];
-            acc[item.category].push(item);
-            return acc;
-        }, {});
-
-        catOrder.forEach(category => {
-            if (!grouped[category]) return;
-
-            const groupDiv = document.createElement('div');
-            groupDiv.className = 'category-group';
-            
-            const title = document.createElement('div');
-            title.className = 'category-title';
-            title.innerHTML = `<span>${category}</span> <span>${grouped[category].length}</span>`;
-            groupDiv.appendChild(title);
-
-            const listDiv = document.createElement('div');
-            listDiv.dataset.category = category;
-            
-            // Ordenar pendientes arriba, completados abajo
-            grouped[category].sort((a, b) => a.completed - b.completed).forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = `item ${item.completed ? 'completed' : ''}`;
-                itemDiv.dataset.id = item.id;
-                
-                let priceHtml = '';
-                if (isPricesEnabled && item.price > 0) {
-                    priceHtml = `<div class="item-price">$${item.price.toFixed(2)}</div>`;
-                }
-
-                itemDiv.innerHTML = `
-                    <div class="drag-handle">≡</div>
-                    <div class="item-content" onclick="toggleItem(${item.id})">
-                        <div class="checkbox"></div>
-                        <div class="item-details">
-                            <span class="item-text">${item.text}</span>
-                            ${item.detail ? `<span class="item-note">${item.detail}</span>` : ''}
-                        </div>
-                        ${priceHtml}
-                    </div>
-                    <div class="actions">
-                        <button class="star-btn ${item.starred ? 'active' : ''}" onclick="toggleStar(${item.id}, event)">
-                            ${item.starred ? '★' : '☆'}
-                        </button>
-                        <button class="delete-btn" onclick="openEdit(${item.id})">✏️</button>
-                        <button class="delete-btn" onclick="deleteItem(${item.id})">🗑️</button>
-                    </div>
-                `;
-                listDiv.appendChild(itemDiv);
-            });
-
-            groupDiv.appendChild(listDiv);
-            container.appendChild(groupDiv);
-
-            // Init Sortable para Drag & Drop
-            new Sortable(listDiv, {
-                group: 'shared',
-                handle: '.drag-handle',
-                animation: 150,
-                onEnd: function (evt) {
-                    const id = parseFloat(evt.item.dataset.id);
-                    const newCategory = evt.to.dataset.category;
-                    const item = items.find(i => i.id === id);
-                    if (item) {
-                        item.category = newCategory;
-                        localStorage.setItem('mercado_items_pro', JSON.stringify(items));
-                        if (navigator.vibrate) navigator.vibrate(15);
-                    }
-                }
-            });
+        
+        window.speechSynthesis.cancel(); // Detener si estaba leyendo algo antes
+        
+        let speechText = "Te falta comprar: ";
+        pending.forEach(item => {
+            speechText += `${item.quantity > 1 ? item.quantity : ''} ${item.text}. `;
         });
+        
+        const msg = new SpeechSynthesisUtterance(speechText);
+        msg.lang = 'es-ES';
+        msg.rate = 0.9; // Un poco más lento para claridad
+        window.speechSynthesis.speak(msg);
+        
+        showToast("🔊 Leyendo lista en voz alta...");
     }
 
-    function updateAISuggestions(inputText) {
-        const container = document.getElementById('chips-container');
-        container.innerHTML = '';
-        let suggestions = new Set();
-        
-        const lowerInput = inputText.toLowerCase().trim();
-        const activeItemNames = items.filter(i => !i.completed).map(i => i.text.toLowerCase());
-        
-        // 1. Sugerencias basadas en lo que escribe AHORA
-        if (lowerInput.length > 1) {
-            smartSuggestionsDB.forEach(rule => {
-                if (rule.trigger !== 'default' && rule.trigger.some(t => t.includes(lowerInput) || lowerInput.includes(t))) {
-                    rule.suggest.forEach(s => suggestions.add(s));
-                }
-            });
-        }
-        
-        // 2. Sugerencias basadas en la lista actual
-        activeItemNames.forEach(itemText => {
-            smartSuggestionsDB.forEach(rule => {
-                if (rule.trigger !== 'default' && rule.trigger.some(t => itemText.includes(t))) {
-                    rule.suggest.forEach(s => suggestions.add(s));
-                }
-            });
-        });
-
-        // 3. Relleno aleatorio
-        if (suggestions.size < 3) {
-            const defs = smartSuggestionsDB.find(r => r.trigger === 'default').suggest;
-            const shuffled = defs.sort(() => 0.5 - Math.random());
-            shuffled.forEach(s => suggestions.add(s));
-        }
-
-        // Filtrar las que ya están en la lista
-        const allCurrent = items.map(i => i.text.toLowerCase());
-        const finalSugg = Array.from(suggestions).filter(s => !allCurrent.includes(s.toLowerCase())).slice(0, 5);
-
-        finalSugg.forEach(sugg => {
-            const chip = document.createElement('div');
-            chip.className = 'chip';
-            chip.innerText = '+ ' + sugg;
-            chip.onclick = () => addItem(sugg);
-            container.appendChild(chip);
-        });
-    }
-
-    function updateFavorites() {
-        const favContainer = document.getElementById('favorites-container');
-        const favs = items.filter(i => i.starred);
-        
-        if (favs.length > 0) {
-            favContainer.style.display = 'flex';
-            favContainer.innerHTML = '';
-            favs.forEach(f => {
-                const chip = document.createElement('div');
-                chip.className = 'chip';
-                chip.style.borderColor = '#f1c40f';
-                chip.style.color = 'var(--text-main)';
-                chip.innerHTML = '⭐ ' + f.text;
-                chip.onclick = () => {
-                    addItem(f.text);
-                    showToast("Agregado de favoritos");
-                };
-                favContainer.appendChild(chip);
-            });
-        } else {
-            favContainer.style.display = 'none';
-        }
-    }
-
-    function updateBottomBar() {
-        const bar = document.getElementById('bottom-bar');
-        if (!isPricesEnabled) {
-            bar.classList.remove('visible');
-            return;
-        }
-
-        const total = items.filter(i => i.completed).reduce((sum, item) => sum + (item.price || 0), 0);
-        const amountEl = document.getElementById('total-amount');
-        amountEl.innerText = `$${total.toFixed(2)}`;
-        
-        if (budgetLimit > 0 && total > budgetLimit) {
-            amountEl.classList.add('over-budget');
-        } else {
-            amountEl.classList.remove('over-budget');
-        }
-        
-        bar.classList.add('visible');
-    }
-
-    function openStatsModal() {
-        document.getElementById('stat-total').innerText = items.length;
-        document.getElementById('stat-done').innerText = items.filter(i => i.completed).length;
-        
-        if (isPricesEnabled) {
-            document.getElementById('stat-money-container').style.display = 'block';
-            const total = items.reduce((sum, i) => sum + (i.price || 0), 0);
-            document.getElementById('stat-money').innerText = `$${total.toFixed(2)}`;
-        } else {
-             document.getElementById('stat-money-container').style.display = 'none';
-        }
-        
-        renderChart();
-        document.getElementById('stats-modal').classList.add('active');
-    }
-
-    function renderChart() {
-        const ctx = document.getElementById('categoryChart').getContext('2d');
-        
-        // Sumar precios (o cantidad si no hay precios) por categoría
-        const catData = {};
-        items.forEach(item => {
-            if (!catData[item.category]) catData[item.category] = 0;
-            catData[item.category] += isPricesEnabled ? (item.price || 0) : 1;
-        });
-
-        const labels = Object.keys(catData);
-        const data = Object.values(catData);
-        const bgColors = ['#4CAF50', '#e74c3c', '#f1c40f', '#3498db', '#9b59b6', '#95a5a6'];
-
-        if (myChart) myChart.destroy();
-
-        myChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: data,
-                    backgroundColor: bgColors,
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'right', labels: { color: getComputedStyle(document.body).getPropertyValue('--text-main') } }
-                }
-            }
-        });
-    }
-
-    document.getElementById('btn-add').addEventListener('click', () => addItem(document.getElementById('item-input').value));
-    
-    document.getElementById('item-input').addEventListener('input', (e) => updateAISuggestions(e.target.value));
-    document.getElementById('item-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') addItem(e.target.value);
-    });
-
-    function setFilter(filter, el) {
-        currentFilter = filter;
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        el.classList.add('active');
-        renderList();
-    }
-
-    function clearCompleted() {
+    // --- STREAMING_CHUNK: Historial y Archivado ---
+    function archiveCompleted() {
         const completed = items.filter(i => i.completed);
-        if (completed.length > 0) {
-            // Guardar en el historial de compras antes de borrar de la lista
-            let history = JSON.parse(localStorage.getItem('mercado_history')) || [];
-            history.push({
-                id: Date.now(),
-                date: new Date().toISOString(),
-                items: completed,
-                total: completed.reduce((sum, item) => sum + (item.price || 0), 0)
-            });
-            localStorage.setItem('mercado_history', JSON.stringify(history));
-
-            deletedCache = completed;
-            items = items.filter(i => !i.completed);
-            saveAndRender();
-            showToast(`${completed.length} artículos guardados en historial`, true);
-        }
-    }
-
-    function undoDelete() {
-        items = [...items, ...deletedCache];
+        if (completed.length === 0) return showToast("No hay artículos comprados para archivar.");
         
-        // Si acabamos de guardar/borrar completados, quitamos el último registro del historial para evitar duplicados si deshacemos
-        let history = JSON.parse(localStorage.getItem('mercado_history')) || [];
-        if (history.length > 0 && deletedCache.length > 0 && deletedCache[0].completed) {
-            let lastEntry = history[history.length - 1];
-            // Validamos que se haya borrado hace menos de 10 segundos
-            if (Date.now() - new Date(lastEntry.date).getTime() < 10000) { 
-                history.pop();
-                localStorage.setItem('mercado_history', JSON.stringify(history));
+        let total = 0;
+        completed.forEach(i => {
+            total += ((i.price || 0) * (i.quantity || 1));
+            // Actualizar memoria de precios de lo que efectivamente compramos
+            if (i.price > 0) {
+                priceMemory[i.text.toLowerCase().trim()] = i.price;
             }
-        }
+        });
+        localStorage.setItem('mercado_prices', JSON.stringify(priceMemory)); // Guardar memoria
 
-        deletedCache = [];
+        const sessionId = Date.now();
+        const session = {
+            id: sessionId,
+            date: new Date().toISOString(),
+            items: completed.map(i => ({...i})),
+            total: total
+        };
+
+        lastDeletedItems = completed;
+        lastActionType = 'archive_completed';
+        lastHistorySessionId = sessionId;
+
+        history.push(session);
+        localStorage.setItem('mercado_history', JSON.stringify(history));
+
+        items = items.filter(i => !i.completed);
         saveAndRender();
-        document.getElementById('toast').classList.remove('show');
+        showToast("Compras archivadas en el historial 📦", true);
+        vibrate([50, 100, 50]);
     }
 
-    function showToast(msg, showUndo = false) {
-        clearTimeout(toastTimeout);
-        const toast = document.getElementById('toast');
-        document.getElementById('toast-msg').innerText = msg;
-        document.getElementById('toast-undo').style.display = showUndo ? 'block' : 'none';
-        toast.classList.add('show');
-        toastTimeout = setTimeout(() => toast.classList.remove('show'), 4000);
-    }
-    
-    document.getElementById('toast-undo').addEventListener('click', undoDelete);
-
-    function exportToWhatsApp() {
-        if (items.length === 0) {
-            showToast("La lista está vacía");
-            return;
-        }
-        
-        let text = "*🛒 Mi Mercado Miwmiwmiw :3*\n\n";
-        
-        const grouped = items.reduce((acc, item) => {
-            if (!acc[item.category]) acc[item.category] = [];
-            acc[item.category].push(item);
-            return acc;
-        }, {});
-
-        for (const category in grouped) {
-            text += `*${category}*\n`;
-            
-            // Ordenar para que los completados queden abajo
-            grouped[category].sort((a, b) => a.completed - b.completed).forEach(item => {
-                let itemName = item.text;
-                if (item.detail) itemName += ` (${item.detail})`;
-                if (isPricesEnabled && item.price > 0) itemName += ` [$${item.price.toFixed(2)}]`;
-                
-                if (item.completed) {
-                    text += `~- ${itemName}~\n`; // Tachado en WhatsApp
-                } else {
-                    text += `- ${itemName}\n`;
-                }
-            });
-            text += "\n";
-        }
-
-        if (isPricesEnabled) {
-            const total = items.filter(i => i.completed).reduce((sum, item) => sum + (item.price || 0), 0);
-            text += `*Total gastado:* $${total.toFixed(2)}\n`;
-        }
-
-        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-        window.open(whatsappUrl, '_blank');
-    }
-
+    // --- STREAMING_CHUNK: Reportes Avanzados ---
     function openReportsModal() {
-        let history = JSON.parse(localStorage.getItem('mercado_history')) || [];
         let today = new Date();
         today.setHours(0,0,0,0);
-        
-        // Inicio de semana (Domingo)
         let startOfWeek = new Date(today);
-        startOfWeek.setDate(today.getDate() - today.getDay()); 
-        
-        // Inicio de mes
+        startOfWeek.setDate(today.getDate() - today.getDay());
         let startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        let startOfYear = new Date(today.getFullYear(), 0, 1);
 
-        let tDay = 0, tWeek = 0, tMonth = 0, tAll = 0;
+        let tDay = 0, tWeek = 0, tMonth = 0, tYear = 0, tAll = 0;
 
         history.forEach(session => {
             let sessionDate = new Date(session.date);
@@ -1223,263 +668,758 @@
             if (sessionDate >= today) tDay += total;
             if (sessionDate >= startOfWeek) tWeek += total;
             if (sessionDate >= startOfMonth) tMonth += total;
+            if (sessionDate >= startOfYear) tYear += total;
         });
 
-        document.getElementById('rep-day').innerText = `$${tDay.toFixed(2)}`;
-        document.getElementById('rep-week').innerText = `$${tWeek.toFixed(2)}`;
-        document.getElementById('rep-month').innerText = `$${tMonth.toFixed(2)}`;
-        document.getElementById('rep-all').innerText = `$${tAll.toFixed(2)}`;
+        if (settings.pricesEnabled) {
+            let currentUnarchivedTotal = items
+                .filter(i => i.completed)
+                .reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+            
+            tAll += currentUnarchivedTotal;
+            tDay += currentUnarchivedTotal;
+            tWeek += currentUnarchivedTotal;
+            tMonth += currentUnarchivedTotal;
+            tYear += currentUnarchivedTotal;
+        }
 
-        document.getElementById('reports-modal').classList.add('active');
+        document.getElementById('rep-day').innerText = `Bs. ${tDay.toFixed(2)}`;
+        document.getElementById('rep-week').innerText = `Bs. ${tWeek.toFixed(2)}`;
+        document.getElementById('rep-month').innerText = `Bs. ${tMonth.toFixed(2)}`;
+        document.getElementById('rep-year').innerText = `Bs. ${tYear.toFixed(2)}`;
+        document.getElementById('rep-all').innerText = `Bs. ${tAll.toFixed(2)}`;
+
+        openModal('reports-modal');
     }
 
     function exportReportsToExcel() {
         try {
-            const wb = XLSX.utils.book_new();
+            const timeframe = document.getElementById('export-timeframe').value;
+            if (history.length === 0) return showToast("No hay historial para exportar.");
 
-            // 1. Historial de Compras (Detallado)
-            let history = JSON.parse(localStorage.getItem('mercado_history')) || [];
-            let historyData = [];
+            let today = new Date(); today.setHours(0,0,0,0);
+            let startOfWeek = new Date(today); startOfWeek.setDate(today.getDate() - today.getDay());
+            let startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            let startOfYear = new Date(today.getFullYear(), 0, 1);
+
+            let filteredHistory = history.filter(session => {
+                let sDate = new Date(session.date);
+                if (timeframe === 'day') return sDate >= today;
+                if (timeframe === 'week') return sDate >= startOfWeek;
+                if (timeframe === 'month') return sDate >= startOfMonth;
+                if (timeframe === 'year') return sDate >= startOfYear;
+                return true; 
+            });
+
+            if (filteredHistory.length === 0) return showToast("No hay compras en el periodo seleccionado.");
+
+            const wb = XLSX.utils.book_new();
             
-            if (history.length > 0) {
-                history.forEach(session => {
-                    const sessionDate = new Date(session.date).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-                    session.items.forEach(item => {
-                        historyData.push({
-                            "Fecha Compra": sessionDate,
-                            "Categoría": item.category,
-                            "Producto": item.text,
-                            "Detalle": item.detail || "-",
-                            "Precio Total": item.price || 0
-                        });
+            let itemsData = [];
+            let catTotals = {};
+            let grandTotal = 0;
+
+            filteredHistory.forEach(session => {
+                const sessionDateStr = new Date(session.date).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+                
+                session.items.forEach(item => {
+                    let price = item.price || 0;
+                    let qty = item.quantity || 1;
+                    let lineTotal = price * qty;
+                    grandTotal += lineTotal;
+                    
+                    if (!catTotals[item.category]) catTotals[item.category] = { spent: 0, count: 0 };
+                    catTotals[item.category].spent += lineTotal;
+                    catTotals[item.category].count += qty;
+
+                    itemsData.push({
+                        "Fecha y Hora": sessionDateStr,
+                        "Categoría": item.category,
+                        "Producto": item.text,
+                        "Detalle/Nota": item.detail || "",
+                        "Cantidad": qty,
+                        "Precio Unitario (Bs.)": price,
+                        "Total Pagado (Bs.)": lineTotal
                     });
                 });
-            } else {
-                historyData.push({"Mensaje": "No hay historial de compras"});
-            }
+            });
 
-            const wsHistory = XLSX.utils.json_to_sheet(historyData);
-            // Ajustar ancho de columnas en Excel
-            wsHistory['!cols'] = [{wch: 20}, {wch: 25}, {wch: 30}, {wch: 25}, {wch: 15}];
-            XLSX.utils.book_append_sheet(wb, wsHistory, "Historial Compras");
+            const wsItems = XLSX.utils.json_to_sheet(itemsData);
+            wsItems['!cols'] = [{wch: 20}, {wch: 25}, {wch: 35}, {wch: 20}, {wch: 10}, {wch: 15}, {wch: 15}];
+            XLSX.utils.book_append_sheet(wb, wsItems, "Detalle de Artículos");
 
-            // 2. Lista Actual (Carro de Compras / Pendientes)
-            let currentData = items.map(item => ({
-                "Estado": item.completed ? "Comprado" : "Falta",
-                "Categoría": item.category,
-                "Producto": item.text,
-                "Detalle": item.detail || "-",
-                "Precio": item.price || 0
+            let summaryData = Object.keys(catTotals).map(cat => ({
+                "Categoría": cat,
+                "Artículos Comprados": catTotals[cat].count,
+                "Gasto Total (Bs.)": catTotals[cat].spent
             }));
             
-            if(currentData.length === 0) currentData.push({"Mensaje": "Lista actual vacía"});
-            
-            const wsCurrent = XLSX.utils.json_to_sheet(currentData);
-            wsCurrent['!cols'] = [{wch: 15}, {wch: 25}, {wch: 30}, {wch: 25}, {wch: 10}];
-            XLSX.utils.book_append_sheet(wb, wsCurrent, "Lista Actual");
+            summaryData.push({ "Categoría": "TOTAL GENERAL", "Artículos Comprados": itemsData.length, "Gasto Total (Bs.)": grandTotal });
 
-            // Generar y descargar archivo
+            const wsSummary = XLSX.utils.json_to_sheet(summaryData);
+            wsSummary['!cols'] = [{wch: 30}, {wch: 20}, {wch: 15}];
+            XLSX.utils.book_append_sheet(wb, wsSummary, "Resumen Categorías");
+
+            let sessionsData = filteredHistory.map(session => ({
+                "ID Ticket": session.id,
+                "Fecha y Hora": new Date(session.date).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+                "Artículos Llevados": session.items.length,
+                "Total Ticket (Bs.)": session.total || 0
+            }));
+
+            const wsSessions = XLSX.utils.json_to_sheet(sessionsData);
+            wsSessions['!cols'] = [{wch: 15}, {wch: 20}, {wch: 20}, {wch: 15}];
+            XLSX.utils.book_append_sheet(wb, wsSessions, "Mis Tickets");
+
+            const tfNames = {day: 'Dia', week: 'Semana', month: 'Mes', year: 'Año', all: 'Historico'};
             const dateStr = new Date().toLocaleDateString('es-ES').replace(/\//g, '-');
-            XLSX.writeFile(wb, `Mi_Mercado_Reporte_${dateStr}.xlsx`);
             
-            showToast("Reporte exportado a Excel 📊");
-            if (navigator.vibrate) navigator.vibrate(100);
+            XLSX.writeFile(wb, `Mircadito_${tfNames[timeframe]}_${dateStr}.xlsx`);
+            
+            showToast(`Reporte de ${tfNames[timeframe]} exportado 📥`);
+            closeModal('reports-modal');
+            
         } catch (error) {
             showToast("Error al exportar a Excel");
             console.error(error);
         }
     }
 
-    // --- NUEVAS FUNCIONES ULTIMATE ---
-
-    function openScanner() {
-        document.getElementById('scanner-modal').classList.add('active');
-        if (!html5QrcodeScanner) {
-            html5QrcodeScanner = new Html5Qrcode("reader");
+    function clearHistory() {
+        if(confirm("¿Estás seguro de borrar TODO el historial de compras? Esto no se puede deshacer.")) {
+            history = [];
+            localStorage.setItem('mercado_history', JSON.stringify(history));
+            showToast("Historial borrado completamente");
+            closeModal('reports-modal');
         }
+    }
+
+    // --- STREAMING_CHUNK: Gráficas y Stats ---
+    function openStatsModal() {
+        if (items.length === 0) return showToast("Agrega items para ver estadísticas.");
         
-        const config = { fps: 10, qrbox: { width: 250, height: 150 }, aspectRatio: 1.0 };
+        const completedCount = items.filter(i => i.completed).length;
+        document.getElementById('stat-total-items').innerText = items.length;
+        document.getElementById('stat-completed').innerText = completedCount;
         
-        html5QrcodeScanner.start(
-            { facingMode: "environment" }, config,
-            (decodedText, decodedResult) => {
-                if (navigator.vibrate) navigator.vibrate([50, 50]);
-                closeScanner();
-                document.getElementById('item-input').value = decodedText;
-                showToast("Código escaneado: " + decodedText);
+        if (settings.pricesEnabled) {
+            document.getElementById('stat-money-box').style.display = 'block';
+            let spent = items.filter(i => i.completed).reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+            document.getElementById('stat-money').innerText = `Bs. ${spent.toFixed(2)}`;
+        } else {
+            document.getElementById('stat-money-box').style.display = 'none';
+        }
+
+        renderChart();
+        openModal('stats-modal');
+    }
+
+    function renderChart() {
+        const ctx = document.getElementById('categoryChart').getContext('2d');
+        if (chartInstance) chartInstance.destroy();
+
+        const catCounts = {};
+        items.forEach(item => {
+            if (!catCounts[item.category]) catCounts[item.category] = 0;
+            catCounts[item.category]++;
+        });
+
+        const labels = Object.keys(catCounts);
+        const data = Object.values(catCounts);
+        const bgColors = labels.map(l => categoriesInfo[l]?.color || '#999');
+
+        chartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{ data: data, backgroundColor: bgColors, borderWidth: 0 }]
             },
-            (errorMessage) => {
-                // Ignorar errores continuos de búsqueda del lente
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'right', labels: { color: 'var(--text-main)', font: {size: 11} } } }
             }
-        ).catch((err) => {
-            showToast("Error al abrir cámara. Revisa permisos.");
-            closeScanner();
         });
     }
 
-    function closeScanner() {
-        document.getElementById('scanner-modal').classList.remove('active');
-        if (html5QrcodeScanner) {
-            html5QrcodeScanner.stop().catch(err => console.error(err));
+    function exportStatsToExcel() {
+        try {
+            if (items.length === 0) return showToast("El carrito está vacío.");
+            
+            const wb = XLSX.utils.book_new();
+            
+            let cartData = items.map(item => ({
+                "Estado": item.completed ? "COMPRADO ✓" : "PENDIENTE",
+                "Categoría": item.category,
+                "Producto": item.text,
+                "Detalle/Nota": item.detail || "",
+                "Cantidad": item.quantity || 1,
+                "Precio Unitario (Bs.)": settings.pricesEnabled ? (item.price || 0) : "",
+                "Total Línea (Bs.)": settings.pricesEnabled ? ((item.price || 0) * (item.quantity || 1)) : ""
+            }));
+            
+            cartData.sort((a, b) => (a.Estado === "PENDIENTE" ? -1 : 1));
+            
+            const wsCart = XLSX.utils.json_to_sheet(cartData);
+            wsCart['!cols'] = [{wch: 15}, {wch: 25}, {wch: 35}, {wch: 20}, {wch: 10}, {wch: 15}, {wch: 15}];
+            XLSX.utils.book_append_sheet(wb, wsCart, "Carrito Actual");
+
+            const dateStr = new Date().toLocaleDateString('es-ES').replace(/\//g, '-');
+            XLSX.writeFile(wb, `Mi_Carrito_${dateStr}.xlsx`);
+            
+            showToast(`Carrito exportado a Excel 📥`);
+            
+        } catch (error) {
+            showToast("Error al exportar");
+            console.error(error);
         }
     }
 
-    function openCheckout() {
-        if (!isPricesEnabled) return;
-        const total = items.filter(i => i.completed).reduce((sum, item) => sum + (item.price || 0), 0);
-        if (total === 0) {
-            showToast("Tu carrito está vacío");
+    // --- STREAMING_CHUNK: Importación Excel "Escáner Humano" ---
+    function importExcel(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, {type: 'array'});
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonMatrix = XLSX.utils.sheet_to_json(firstSheet, {header: 1, defval: ""});
+            
+            let addedCount = 0;
+            const ignoreWords = ['total', 'efectivo', 'qr', 'tarjetas', 'pago', 'cada uno', 'almacen', 'frutas'];
+
+            for (let row = 0; row < jsonMatrix.length; row++) {
+                for (let col = 0; col < jsonMatrix[row].length; col++) {
+                    let cellVal = String(jsonMatrix[row][col]).trim();
+                    
+                    if (cellVal && isNaN(cellVal) && cellVal.length > 2) {
+                        let isForbidden = ignoreWords.some(w => cellVal.toLowerCase().includes(w));
+                        if(isForbidden) continue;
+
+                        let priceVal = 0;
+                        if (col + 1 < jsonMatrix[row].length) {
+                            let nextCell = jsonMatrix[row][col+1];
+                            if (!isNaN(parseFloat(nextCell))) {
+                                priceVal = parseFloat(nextCell);
+                            }
+                        }
+
+                        items.push({
+                            id: Date.now() + Math.random(),
+                            text: cellVal,
+                            category: determineCategory(cellVal),
+                            completed: false,
+                            price: priceVal,
+                            quantity: 1,
+                            detail: '📊 Excel'
+                        });
+                        addedCount++;
+                    }
+                }
+            }
+
+            if (addedCount > 0) {
+                if(!settings.pricesEnabled && items.some(i => i.price > 0)) {
+                    settings.pricesEnabled = true;
+                    applySettings();
+                }
+                saveAndRender();
+                showToast(`${addedCount} productos extraídos del Excel ✅`);
+                vibrate(100);
+            } else {
+                showToast("No se encontraron productos legibles.");
+            }
+        };
+        reader.readAsArrayBuffer(file);
+        e.target.value = ''; 
+    }
+
+    // --- STREAMING_CHUNK: Edición y Listas ---
+    function openEdit(id) {
+        const item = items.find(i => i.id === id);
+        if(!item) return;
+        document.getElementById('edit-id').value = item.id;
+        document.getElementById('edit-text').value = item.text;
+        document.getElementById('edit-category').value = item.category;
+        document.getElementById('edit-detail').value = item.detail || '';
+        document.getElementById('edit-price').value = item.price || 0;
+        openModal('edit-modal');
+    }
+
+    function saveEdit() {
+        const id = Number(document.getElementById('edit-id').value);
+        const item = items.find(i => i.id === id);
+        if(item) {
+            item.text = document.getElementById('edit-text').value;
+            item.category = document.getElementById('edit-category').value;
+            item.detail = document.getElementById('edit-detail').value;
+            item.price = parseFloat(document.getElementById('edit-price').value) || 0;
+            
+            // Actualizar memoria si editas un precio
+            if (item.price > 0) {
+                priceMemory[item.text.toLowerCase().trim()] = item.price;
+                localStorage.setItem('mercado_prices', JSON.stringify(priceMemory));
+            }
+            
+            saveAndRender();
+        }
+        closeModal('edit-modal');
+    }
+
+    function updateItemField(id, field, value) {
+        const item = items.find(i => i.id === id);
+        if(item) {
+            let num = parseFloat(value);
+            if(isNaN(num) || num < 0) num = field === 'quantity' ? 1 : 0;
+            item[field] = num;
+            
+            // Si modifica el precio directamente en el input rápido, aprenderlo
+            if (field === 'price' && num > 0) {
+                priceMemory[item.text.toLowerCase().trim()] = num;
+                localStorage.setItem('mercado_prices', JSON.stringify(priceMemory));
+            }
+            
+            saveAndRender();
+        }
+    }
+
+    function toggleFavorite(text) {
+        const index = favorites.indexOf(text);
+        if (index > -1) favorites.splice(index, 1);
+        else favorites.push(text);
+        localStorage.setItem('mercado_favorites', JSON.stringify(favorites));
+        renderFavorites();
+        renderList(); 
+        showToast(index > -1 ? "Removido de favoritos" : "Agregado a favoritos");
+    }
+
+    function renderFavorites() {
+        if (favorites.length === 0) {
+            favoritesBar.style.display = 'none';
             return;
         }
-        document.getElementById('checkout-total').innerText = `$${total.toFixed(2)}`;
-        document.getElementById('checkout-payment').value = '';
-        document.getElementById('checkout-change').innerText = `$0.00`;
-        document.getElementById('checkout-modal').classList.add('active');
+        favoritesBar.style.display = 'flex';
+        favoritesBar.innerHTML = '';
+        favorites.forEach(fav => {
+            const div = document.createElement('div');
+            div.className = 'fav-chip';
+            div.innerHTML = `⭐ ${fav}`;
+            div.onclick = () => addItem(fav);
+            favoritesBar.appendChild(div);
+        });
     }
 
-    function calculateChange() {
-        const total = items.filter(i => i.completed).reduce((sum, item) => sum + (item.price || 0), 0);
-        const payment = parseFloat(document.getElementById('checkout-payment').value) || 0;
-        const change = payment - total;
-        
-        const changeEl = document.getElementById('checkout-change');
-        if (change < 0) {
-            changeEl.innerText = `Faltan $${Math.abs(change).toFixed(2)}`;
-            changeEl.style.color = 'var(--danger)';
-        } else {
-            changeEl.innerText = `$${change.toFixed(2)}`;
-            changeEl.style.color = 'var(--primary)';
-        }
+    function setFilter(f) {
+        currentFilter = f;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(`tab-${f}`).classList.add('active');
+        renderList();
     }
 
-    async function generateRecipe() {
-        const apiKey = document.getElementById('api-key').value;
-        const completedItems = items.filter(i => i.completed).map(i => i.text);
-        const recipeContent = document.getElementById('recipe-content');
-        
-        document.getElementById('recipe-modal').classList.add('active');
-        
-        if (completedItems.length === 0) {
-            recipeContent.innerHTML = "Tu carrito está vacío. ¡Marca algunos ingredientes como comprados primero!";
+    function sortListByPrice() {
+        isSortDesc = !isSortDesc;
+        const icon = isSortDesc ? "⬇️" : "⬆️";
+        document.getElementById('sort-icon').innerText = `${icon} Precio`;
+        renderList();
+    }
+
+    function renderList() {
+        listContainer.innerHTML = '';
+        let filteredItems = [...items];
+
+        if (currentFilter === 'pending') filteredItems = filteredItems.filter(i => !i.completed);
+        if (currentFilter === 'completed') filteredItems = filteredItems.filter(i => i.completed);
+
+        if (filteredItems.length === 0) {
+            listContainer.innerHTML = '<div class="empty-state">No hay productos aquí.<br>Agrega algo para empezar. 🛒</div>';
+            updateBudgetUI();
             return;
         }
 
-        recipeContent.innerHTML = "Pensando una receta deliciosa con lo que llevas en el carrito... 👩‍🍳💭";
+        if (settings.pricesEnabled) {
+            filteredItems.sort((a, b) => isSortDesc ? (b.price||0) - (a.price||0) : (a.price||0) - (b.price||0));
+        }
 
-        if (apiKey) {
-            try {
-                const prompt = `Soy un usuario en el supermercado. Tengo estos ingredientes ya en mi carrito: ${completedItems.join(', ')}. Sugiere una receta creativa, rápida y sencilla que pueda hacer con ellos (puedes asumir que tengo agua, sal y aceite). Da un título, ingredientes extra opcionales y pasos breves.`;
+        const grouped = filteredItems.reduce((acc, item) => {
+            if (!acc[item.category]) acc[item.category] = [];
+            acc[item.category].push(item);
+            return acc;
+        }, {});
+
+        Object.keys(grouped).sort().forEach(category => {
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'category-group';
+            groupDiv.dataset.category = category;
+            
+            const catInfo = categoriesInfo[category] || categoriesInfo['📦 OTROS'];
+            
+            const header = document.createElement('div');
+            header.className = 'category-header';
+            header.innerHTML = `
+                <div class="category-title"><span style="font-size:20px">${catInfo.icon}</span> ${category}</div>
+                <div style="font-size: 12px; color: var(--text-muted); font-weight: bold;">${grouped[category].length}</div>
+            `;
+            groupDiv.appendChild(header);
+
+            const listDiv = document.createElement('div');
+            listDiv.className = 'sortable-list';
+
+            grouped[category].forEach(item => {
+                const isFav = favorites.includes(item.text);
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `item ${item.completed ? 'completed' : ''}`;
+                itemDiv.dataset.id = item.id;
                 
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                let detailsHTML = '';
+                if(item.detail) detailsHTML += `<span>${item.detail}</span>`;
+
+                itemDiv.innerHTML = `
+                    <div class="item-main" onclick="toggleItem(${item.id}, event)">
+                        <span class="drag-handle">≡</span>
+                        <div class="checkbox"></div>
+                        <div class="item-info">
+                            <div class="item-text">${item.text}</div>
+                            ${detailsHTML ? `<div class="item-details">${detailsHTML}</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="item-actions-container">
+                        <div class="inline-data" onclick="event.stopPropagation()">
+                            <span class="inline-label">Cant:</span>
+                            <input type="number" class="mini-input qty-input" value="${item.quantity || 1}" min="1" onchange="updateItemField(${item.id}, 'quantity', this.value)" onclick="this.select()">
+                            ${settings.pricesEnabled ? `
+                            <span class="inline-label">Bs.</span>
+                            <input type="number" class="mini-input price-input" value="${item.price || 0}" min="0" step="0.5" onchange="updateItemField(${item.id}, 'price', this.value)" onclick="this.select()">
+                            ` : ''}
+                        </div>
+                        <div class="item-actions">
+                            <button class="action-mini-btn fav" onclick="toggleFavorite('${item.text}')">${isFav ? '⭐' : '☆'}</button>
+                            <button class="action-mini-btn edit" onclick="openEdit(${item.id})">✏️</button>
+                            <button class="action-mini-btn delete" onclick="confirmDelete(${item.id})">🗑️</button>
+                        </div>
+                    </div>
+                `;
+                listDiv.appendChild(itemDiv);
+            });
+
+            groupDiv.appendChild(listDiv);
+            listContainer.appendChild(groupDiv);
+
+            new Sortable(listDiv, {
+                group: 'shared',
+                handle: '.drag-handle',
+                animation: 150,
+                onEnd: function (evt) {
+                    const itemEl = evt.item;
+                    const itemId = Number(itemEl.dataset.id);
+                    const newCategory = evt.to.closest('.category-group').dataset.category;
+                    
+                    const item = items.find(i => i.id === itemId);
+                    if(item && item.category !== newCategory) {
+                        item.category = newCategory;
+                        saveAndRender();
+                        vibrate(50);
+                    }
+                }
+            });
+        });
+
+        updateBudgetUI();
+    }
+
+    // --- STREAMING_CHUNK: Presupuesto y WhatsApp ---
+    function updateBudgetUI() {
+        if (!settings.pricesEnabled) {
+            budgetBar.style.display = 'none';
+            return;
+        }
+        
+        budgetBar.style.display = 'block';
+        
+        let currentTotal = 0;
+        let prefixText = "Total de la Lista: Bs. ";
+
+        if (currentFilter === 'all') {
+            currentTotal = items.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+            prefixText = "Total de la Lista: Bs. ";
+        } else if (currentFilter === 'pending') {
+            currentTotal = items.filter(i => !i.completed).reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+            prefixText = "Total Pendientes: Bs. ";
+        } else if (currentFilter === 'completed') {
+            currentTotal = items.filter(i => i.completed).reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+            prefixText = "Total Comprados: Bs. ";
+        }
+
+        budgetBar.innerHTML = `${prefixText}<span id="budget-total">${currentTotal.toFixed(2)}</span>`;
+
+        if (settings.budgetLimit > 0 && currentTotal > settings.budgetLimit) {
+            budgetBar.classList.add('over-budget');
+        } else {
+            budgetBar.classList.remove('over-budget');
+        }
+    }
+
+    function exportToWhatsApp() {
+        if(items.length === 0) return showToast("La lista está vacía");
+
+        let msg = "*🛒 MIRCADITO :3*\n\n";
+        
+        const grouped = items.reduce((acc, item) => {
+            if (!acc[item.category]) acc[item.category] = [];
+            acc[item.category].push(item);
+            return acc;
+        }, {});
+
+        Object.keys(grouped).sort().forEach(cat => {
+            msg += `*${cat}*\n`;
+            grouped[cat].forEach(item => {
+                let qty = item.quantity || 1;
+                let text = qty > 1 ? `${qty}x ${item.text}` : item.text;
+                if(settings.pricesEnabled && item.price > 0) {
+                    let totalLinea = qty * item.price;
+                    text += ` (Bs. ${totalLinea})`;
+                }
+                if(item.detail) text += ` - _${item.detail}_`;
+                
+                if(item.completed) {
+                    msg += `~- ${text}~\n`;
+                } else {
+                    msg += `- ${text}\n`;
+                }
+            });
+            msg += `\n`;
+        });
+
+        const encodedMsg = encodeURIComponent(msg);
+        window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('mercado_items', JSON.stringify(items));
+        renderList();
+        updateAISuggestions();
+    }
+
+    // --- STREAMING_CHUNK: Helpers (Toast, Scanner, Receta, Ajustes) ---
+    function showToast(msg, showUndo = false) {
+        const t = document.getElementById('toast');
+        document.getElementById('toast-msg').innerText = msg;
+        document.getElementById('toast-undo').style.display = showUndo ? 'block' : 'none';
+        
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 4000);
+    }
+
+    function undoAction() {
+        if (lastActionType === 'delete_single' && lastDeletedItems.length > 0) {
+            items.push(lastDeletedItems[0]);
+        } 
+        else if (lastActionType === 'archive_completed' && lastDeletedItems.length > 0) {
+            items.push(...lastDeletedItems);
+            if(lastHistorySessionId) {
+                history = history.filter(s => s.id !== lastHistorySessionId);
+                localStorage.setItem('mercado_history', JSON.stringify(history));
+            }
+        }
+        
+        lastDeletedItems = [];
+        lastActionType = '';
+        saveAndRender();
+        document.getElementById('toast').classList.remove('show');
+        vibrate(50);
+    }
+
+    function vibrate(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
+
+    // Scanner
+    function startScanner() {
+        openModal('scanner-modal');
+        if(!html5QrcodeScanner) {
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+            html5QrcodeScanner.render(
+                (decodedText) => {
+                    document.getElementById('scan-result').value = decodedText;
+                    vibrate(100);
+                },
+                (err) => { console.warn(err); }
+            );
+        }
+    }
+    function processScannedCode() {
+        const val = document.getElementById('scan-result').value;
+        if(val) { addItem("Código: " + val); closeModal('scanner-modal'); }
+    }
+    function stopScanner() {
+        if(html5QrcodeScanner) { html5QrcodeScanner.clear(); html5QrcodeScanner = null; }
+        closeModal('scanner-modal');
+    }
+
+    // Generar Receta
+    async function generateRecipe() {
+        const completedItems = items.filter(i => i.completed).map(i => i.text);
+        if (completedItems.length === 0) return showToast("Marca productos como comprados primero.");
+
+        const modal = document.getElementById('recipe-modal');
+        const contentDiv = document.getElementById('recipe-content');
+        const loadingDiv = document.getElementById('recipe-loading');
+
+        modal.classList.add('active');
+        contentDiv.style.display = 'none';
+        loadingDiv.style.display = 'block';
+
+        if (settings.apiKey) {
+            try {
+                const prompt = `Actúa como un chef profesional. Tengo: ${completedItems.join(', ')}. Genera UNA receta creativa, deliciosa y fácil utilizando principalmente estos ingredientes. Formato: 1. Título 2. Ingredientes extra 3. Pasos cortos.`;
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${settings.apiKey}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
+                if (!response.ok) throw new Error("API Error");
                 const data = await response.json();
-                if (data.candidates && data.candidates[0]) {
-                    recipeContent.innerHTML = data.candidates[0].content.parts[0].text;
-                } else {
-                    throw new Error("Respuesta inválida");
-                }
+                contentDiv.innerHTML = data.candidates[0].content.parts[0].text;
             } catch (error) {
-                recipeContent.innerHTML = "Hubo un error con la IA. Revisa tu conexión o tu API Key.";
+                contentDiv.innerHTML = `Error con la API de Gemini. Revisa tu conexión o llave API.`;
             }
         } else {
-            const randIdx = Math.floor(Math.random() * completedItems.length);
-            recipeContent.innerHTML = `
-                <strong style="color:var(--primary); font-size:18px;">Revuelto Especial de ${completedItems[randIdx]}</strong><br><br>
-                <strong>Ingredientes Base:</strong><br>
-                - ${completedItems.slice(0, 4).join('<br>- ')}<br>
-                - Una pizca de creatividad<br><br>
-                <strong>Preparación Rápida:</strong><br>
-                1. Corta finamente los ingredientes.<br>
-                2. Saltéalos en una sartén con un poco de aceite.<br>
-                3. ¡Sirve caliente y disfruta!<br><br>
-                <em>(Usa tu API Key de Gemini en Ajustes para generar recetas reales ilimitadas).</em>
-            `;
+            setTimeout(() => {
+                let recipe = `🥗 Receta Miwmiwmiw (Simulada)\n\nCon ingredientes como **${completedItems[0]}** y **${completedItems[1] || 'algo más'}**, podrías preparar un plato genial:\n\n**Revuelto Especial Miwmiwmiw**\n\n**Pasos:**\n1. Prepara ${completedItems[0]} como base.\n3. Añade sal, pimienta y amor.\n\n*(Nota: Ingresa tu API Key de Gemini en Ajustes para recetas reales)*`;
+                contentDiv.innerHTML = recipe;
+                loadingDiv.style.display = 'none';
+                contentDiv.style.display = 'block';
+            }, 1500);
+            return; 
         }
+
+        loadingDiv.style.display = 'none';
+        contentDiv.style.display = 'block';
     }
 
-    function clearHistory() {
-        // Modal de confirmación UI (Evitando el alert por defecto del navegador)
-        document.getElementById('reports-modal').classList.remove('active');
+    function updateAISuggestions() {
+        chipsContainer.innerHTML = '';
+        const currentText = input.value.toLowerCase().trim();
+        const activeItems = items.map(i => i.text.toLowerCase());
+        let suggestions = new Set();
         
-        const confirmModal = document.createElement('div');
-        confirmModal.className = 'modal active';
-        confirmModal.style.zIndex = '2000';
-        confirmModal.innerHTML = `
-            <div class="modal-content" style="text-align:center;">
-                <div class="modal-title" style="color:var(--danger);">⚠️ Borrar Historial</div>
-                <p style="margin-bottom:20px;">¿Estás seguro de que quieres borrar de forma permanente tu historial y estadísticas de compra?</p>
-                <button class="modal-btn" style="background:var(--danger);" id="btn-confirm-delete">Sí, Borrar Todo</button>
-                <button class="modal-btn secondary" id="btn-cancel-delete">Cancelar</button>
-            </div>
-        `;
-        document.body.appendChild(confirmModal);
-        
-        document.getElementById('btn-confirm-delete').onclick = () => {
-            localStorage.removeItem('mercado_history');
-            document.body.removeChild(confirmModal);
-            showToast("Historial borrado permanentemente", false);
-        };
-        
-        document.getElementById('btn-cancel-delete').onclick = () => {
-            document.body.removeChild(confirmModal);
-            openReportsModal(); // Reabrir reportes
-        };
+        smartSuggestionsDB.forEach(rule => {
+            const matchesText = currentText && rule.trigger.some(t => t.includes(currentText));
+            const matchesList = activeItems.some(item => rule.trigger.some(t => item.includes(t)));
+            if (matchesText || matchesList) rule.suggest.forEach(s => suggestions.add(s));
+        });
+
+        let finalArr = Array.from(suggestions).filter(s => !activeItems.includes(s.toLowerCase()));
+        if (finalArr.length === 0) finalArr = fallbackSuggestions.filter(s => !activeItems.includes(s.toLowerCase())).sort(() => 0.5 - Math.random()).slice(0, 5);
+        else finalArr = finalArr.slice(0, 5);
+
+        finalArr.forEach(s => {
+            const chip = document.createElement('div');
+            chip.className = 'chip'; chip.innerText = '+ ' + s;
+            chip.onclick = () => addItem(s);
+            chipsContainer.appendChild(chip);
+        });
     }
 
+    input.addEventListener('input', updateAISuggestions);
+    input.addEventListener('keypress', e => { if (e.key === 'Enter') addItem(input.value); });
+    document.getElementById('btn-add').addEventListener('click', () => addItem(input.value));
+
+    // Ajustes
     function applySettings() {
-        const theme = document.getElementById('theme-color').value;
-        const isDark = document.getElementById('dark-mode-toggle').checked;
-        budgetLimit = parseFloat(document.getElementById('budget-input').value) || 0;
+        if(settings.darkMode) document.body.classList.add('dark-mode');
+        else document.body.classList.remove('dark-mode');
 
-        // Aplicar el tema y modo oscuro al HTML
-        if (isDark && theme === 'emerald') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        } else {
-            document.documentElement.setAttribute('data-theme', theme);
-        }
-        
-        if (isDark) {
-            document.documentElement.setAttribute('data-theme-mode', 'dark');
-        } else {
-            document.documentElement.removeAttribute('data-theme-mode');
-        }
+        document.body.classList.remove('theme-ocean', 'theme-purple', 'theme-sunset');
+        if(settings.theme !== 'emerald') document.body.classList.add(`theme-${settings.theme}`);
 
-        // Guardar ajustes
-        localStorage.setItem('mercado_theme', theme);
-        localStorage.setItem('mercado_dark', isDark);
-        localStorage.setItem('mercado_budget', budgetLimit);
-        localStorage.setItem('mercado_api', document.getElementById('api-key').value);
+        document.getElementById('set-dark').checked = settings.darkMode;
+        document.getElementById('set-theme').value = settings.theme;
+        document.getElementById('set-prices').checked = settings.pricesEnabled;
+        document.getElementById('set-budget-limit').value = settings.budgetLimit || '';
+        document.getElementById('set-wakelock').checked = settings.wakeLockEnabled;
+        document.getElementById('set-apikey').value = settings.apiKey;
+
+        document.getElementById('budget-limit-group').style.display = settings.pricesEnabled ? 'block' : 'none';
         
-        updateBottomBar();
+        toggleWakeLock(true);
     }
 
     function togglePrices() {
-        isPricesEnabled = document.getElementById('prices-toggle').checked;
-        localStorage.setItem('mercado_prices', isPricesEnabled);
-        document.getElementById('budget-group').style.display = isPricesEnabled ? 'block' : 'none';
-        saveAndRender();
+        settings.pricesEnabled = document.getElementById('set-prices').checked;
+        document.getElementById('budget-limit-group').style.display = settings.pricesEnabled ? 'block' : 'none';
     }
 
-    // Init
-    window.onload = () => {
-        document.getElementById('theme-color').value = localStorage.getItem('mercado_theme') || 'emerald';
-        document.getElementById('dark-mode-toggle').checked = localStorage.getItem('mercado_dark') === 'true';
-        document.getElementById('prices-toggle').checked = isPricesEnabled;
-        document.getElementById('budget-input').value = budgetLimit || '';
-        document.getElementById('api-key').value = localStorage.getItem('mercado_api') || '';
+    function saveSettings() {
+        settings.darkMode = document.getElementById('set-dark').checked;
+        settings.theme = document.getElementById('set-theme').value;
+        settings.pricesEnabled = document.getElementById('set-prices').checked;
+        settings.budgetLimit = parseFloat(document.getElementById('set-budget-limit').value) || 0;
+        settings.wakeLockEnabled = document.getElementById('set-wakelock').checked;
+        settings.apiKey = document.getElementById('set-apikey').value.trim();
         
-        togglePrices();
+        localStorage.setItem('mercado_settings', JSON.stringify(settings));
         applySettings();
-        saveAndRender();
-        
-        // Wake Lock
-        if ('wakeLock' in navigator) {
-            navigator.wakeLock.request('screen').catch(err => console.log('Wake Lock denied'));
+        saveAndRender(); 
+        closeModal('settings-modal');
+        showToast("Ajustes guardados");
+    }
+
+    async function toggleWakeLock(init = false) {
+        if (!('wakeLock' in navigator)) return;
+        try {
+            if (settings.wakeLockEnabled && !wakeLock) {
+                wakeLock = await navigator.wakeLock.request('screen');
+            } else if (!settings.wakeLockEnabled && wakeLock) {
+                await wakeLock.release();
+                wakeLock = null;
+            }
+        } catch (err) { console.log(err); }
+    }
+
+    function populateCategorySelect() {
+        const sel = document.getElementById('edit-category');
+        sel.innerHTML = '';
+        Object.keys(categoriesInfo).forEach(cat => {
+            const opt = document.createElement('option');
+            opt.value = cat; opt.innerText = cat;
+            sel.appendChild(opt);
+        });
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function openSettings() { openModal('settings-modal'); }
+
+    // Calculadora
+    function openCalculator() {
+        if(!settings.pricesEnabled) return;
+        document.getElementById('calc-total').innerText = "Bs. " + document.getElementById('budget-total').innerText;
+        document.getElementById('calc-payment').value = '';
+        document.getElementById('calc-change').innerText = "Bs. 0.00";
+        openModal('calc-modal');
+    }
+
+    function calculateChange() {
+        const totalText = document.getElementById('calc-total').innerText;
+        const total = parseFloat(totalText.replace('Bs.','').trim());
+        const payment = parseFloat(document.getElementById('calc-payment').value) || 0;
+        const change = payment - total;
+        document.getElementById('calc-change').innerText = change >= 0 ? `Bs. ${change.toFixed(2)}` : "Monto insuficiente";
+        document.getElementById('calc-change').style.color = change >= 0 ? "var(--primary)" : "var(--danger)";
+    }
+
+    function shootConfetti() {
+        for(let i=0; i<30; i++) {
+            const conf = document.createElement('div');
+            conf.innerText = ['🎉','✨','🎊','🛒'][Math.floor(Math.random()*4)];
+            conf.style.position = 'fixed'; conf.style.left = Math.random()*100+'vw';
+            conf.style.top = '-20px'; conf.style.fontSize = Math.random()*20+10+'px';
+            conf.style.zIndex = '9999'; conf.style.transition = 'all 2s ease-in';
+            document.body.appendChild(conf);
+            setTimeout(() => { conf.style.top = '120vh'; conf.style.transform = `rotate(${Math.random()*360}deg)`; }, 10);
+            setTimeout(() => conf.remove(), 2000);
         }
-    };
+    }
+
+    init();
 </script>
 </body>
 </html>

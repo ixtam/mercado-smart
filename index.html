@@ -15,6 +15,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- NUEVA LIBRERÍA PARA CÓDIGOS DE BARRAS -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
     <style>
         :root {
@@ -68,6 +70,8 @@
         .icon-btn.settings { background-color: #7f8c8d; color: white; }
         .icon-btn.tts { background-color: #ff9800; color: white; }
         .icon-btn.focus { background-color: #e74c3c; color: white; } /* Botón Modo Enfoque */
+        .icon-btn.my-recipes { background-color: #e67e22; color: white; } /* Botón Mis Recetas */
+        .icon-btn.compare { background-color: #00bcd4; color: white; } /* Comparador */
 
         .tabs { display: flex; background: var(--bg-color); border-radius: 12px; padding: 4px; margin-bottom: 15px; }
         .tab { flex: 1; text-align: center; padding: 8px; border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
@@ -216,6 +220,8 @@
             <div class="action-btns">
                 <button class="icon-btn focus" onclick="toggleFocusMode()" title="Modo Supermercado">👁️</button>
                 <button class="icon-btn tts" onclick="readPendingList()" title="Leer pendientes en voz alta">🔊</button>
+                <button class="icon-btn my-recipes" onclick="openPersonalRecipesModal()" title="Mis Recetas Frecuentes">🍲</button>
+                <button class="icon-btn compare" onclick="openCompareModal()" title="Comparador de Precios">⚖️</button>
                 <label for="file-upload" class="icon-btn excel" title="Cargar Excel">📁</label>
                 <input id="file-upload" type="file" accept=".xlsx, .xls" onchange="importExcel(event)" />
                 <button class="icon-btn stats" onclick="openStatsModal()" title="Estadísticas de la Lista">📊</button>
@@ -502,6 +508,54 @@
     </div>
 </div>
 
+<!-- Modal Mis Recetas Personales (REEMPLAZO BILLETERA) -->
+<div class="modal" id="personal-recipes-modal">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <div class="modal-title">🍲 Mis Platos Frecuentes</div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Guarda los ingredientes de tus comidas favoritas y envíalos a tu lista con 1 toque.</p>
+        
+        <div id="recipes-container" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px; text-align: left;">
+            <!-- Aquí se generan las recetas -->
+        </div>
+
+        <div style="background: var(--bg-color); padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: left;">
+            <label style="font-size: 13px; font-weight: bold; margin-bottom:5px; display:block;">Nuevo Plato Frecuente:</label>
+            <input type="text" id="new-recipe-name" placeholder="Ej. Asado Familiar" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 8px; outline:none;">
+            <textarea id="new-recipe-ingredients" placeholder="Ej. Carne, Carbón, Chorizo, Papa, Yuca (separados por comas)" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 8px; outline:none; font-family: inherit; resize: vertical; min-height: 60px;"></textarea>
+            <button class="modal-btn primary" style="padding: 10px;" onclick="addPersonalRecipe()">➕ Guardar Receta</button>
+        </div>
+        
+        <button class="modal-btn secondary" onclick="closeModal('personal-recipes-modal')">Cerrar</button>
+    </div>
+</div>
+
+<!-- Modal Comparador de Precios (PREMIUM) -->
+<div class="modal" id="compare-modal">
+    <div class="modal-content">
+        <div class="modal-title">⚖️ Comparador Inteligente</div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px; text-align:center;">Descubre qué envase / promoción te conviene comprar.</p>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <div style="flex: 1; background: var(--bg-color); padding: 15px; border-radius: 12px; text-align: center;">
+                <h4 style="margin-bottom: 10px; color: var(--text-main);">Opción A</h4>
+                <input type="number" id="comp-price-a" placeholder="Precio (Bs)" oninput="calculateBestValue()" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 8px; text-align:center;">
+                <input type="number" id="comp-size-a" placeholder="Gramos/Ml/Uds" oninput="calculateBestValue()" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc; text-align:center;">
+            </div>
+            <div style="flex: 1; background: var(--bg-color); padding: 15px; border-radius: 12px; text-align: center;">
+                <h4 style="margin-bottom: 10px; color: var(--text-main);">Opción B</h4>
+                <input type="number" id="comp-price-b" placeholder="Precio (Bs)" oninput="calculateBestValue()" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 8px; text-align:center;">
+                <input type="number" id="comp-size-b" placeholder="Gramos/Ml/Uds" oninput="calculateBestValue()" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc; text-align:center;">
+            </div>
+        </div>
+
+        <div id="compare-result" style="text-align: center; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; min-height: 50px; background: var(--primary-light); color: var(--primary); margin-bottom: 15px;">
+            Ingresa los datos para comparar.
+        </div>
+
+        <button class="modal-btn secondary" onclick="closeModal('compare-modal')">Cerrar</button>
+    </div>
+</div>
+
 <div class="toast" id="toast">
     <span id="toast-msg">Acción realizada</span>
     <span class="toast-undo" id="toast-undo" style="display:none;" onclick="undoAction()">Deshacer</span>
@@ -513,6 +567,7 @@
     let history = JSON.parse(localStorage.getItem('mercado_history')) || [];
     let favorites = JSON.parse(localStorage.getItem('mercado_favorites')) || [];
     let priceMemory = JSON.parse(localStorage.getItem('mercado_prices')) || {}; 
+    let personalRecipes = JSON.parse(localStorage.getItem('mercado_recipes')) || [];
     
     let settings = JSON.parse(localStorage.getItem('mercado_settings')) || {
         darkMode: false,
@@ -1338,6 +1393,141 @@
     }
 
     // --- STREAMING_CHUNK: Utilidades de Sistema (Ajustes, Edición, Animaciones) ---
+    function openPersonalRecipesModal() {
+        renderPersonalRecipes();
+        openModal('personal-recipes-modal');
+    }
+
+    function renderPersonalRecipes() {
+        const container = document.getElementById('recipes-container');
+        container.innerHTML = '';
+        if (personalRecipes.length === 0) {
+            container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px; text-align:center;">No has guardado platos aún. ¡Ahorra tiempo guardando lo que siempre cocinas!</p>';
+            return;
+        }
+
+        personalRecipes.forEach((recipe, index) => {
+            const recipeDiv = document.createElement('div');
+            recipeDiv.style.background = 'var(--card-bg)';
+            recipeDiv.style.padding = '15px';
+            recipeDiv.style.borderRadius = '12px';
+            recipeDiv.style.marginBottom = '10px';
+            recipeDiv.style.boxShadow = 'var(--shadow)';
+            recipeDiv.style.border = '1px solid rgba(0,0,0,0.05)';
+
+            recipeDiv.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <h4 style="color: var(--primary); margin:0; font-size: 16px;">${recipe.name}</h4>
+                    <button onclick="deletePersonalRecipe(${index})" style="background:none; border:none; color:var(--danger); font-size: 18px; cursor:pointer;" title="Borrar receta">🗑️</button>
+                </div>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4;">${recipe.ingredients.join(', ')}</p>
+                <button class="modal-btn" style="background: var(--primary-light); color: var(--primary); padding: 8px; font-size: 14px; width: 100%; border: 1px solid var(--primary); box-shadow: none;" onclick="addRecipeToCart(${index})">
+                    🛒 Añadir ingredientes a la lista
+                </button>
+            `;
+            container.appendChild(recipeDiv);
+        });
+    }
+
+    function addPersonalRecipe() {
+        const name = document.getElementById('new-recipe-name').value.trim();
+        const ingRaw = document.getElementById('new-recipe-ingredients').value.trim();
+        if (!name || !ingRaw) return showToast("Escribe el nombre y al menos un ingrediente.");
+        
+        const ingredients = ingRaw.split(',').map(i => i.trim()).filter(i => i.length > 1);
+        
+        personalRecipes.push({ name, ingredients });
+        localStorage.setItem('mercado_recipes', JSON.stringify(personalRecipes));
+        
+        document.getElementById('new-recipe-name').value = '';
+        document.getElementById('new-recipe-ingredients').value = '';
+        renderPersonalRecipes();
+        showToast("¡Receta personal guardada! 🍲");
+    }
+
+    function deletePersonalRecipe(index) {
+        personalRecipes.splice(index, 1);
+        localStorage.setItem('mercado_recipes', JSON.stringify(personalRecipes));
+        renderPersonalRecipes();
+    }
+
+    function addRecipeToCart(index) {
+        const recipe = personalRecipes[index];
+        let addedCount = 0;
+        
+        recipe.ingredients.forEach(ing => {
+            const exists = items.find(i => i.text.toLowerCase() === ing.toLowerCase() && !i.completed);
+            if(!exists) {
+                // Usamos la función nativa para que adivine la categoría y ponga el precio guardado
+                const defaultPrice = priceMemory[ing.toLowerCase()] || 0;
+                items.push({
+                    id: Date.now() + Math.random(),
+                    text: ing,
+                    category: determineCategory(ing),
+                    completed: false,
+                    price: defaultPrice,
+                    quantity: 1,
+                    detail: `Receta: ${recipe.name}` // Etiqueta automática
+                });
+                addedCount++;
+            }
+        });
+        
+        if (addedCount > 0) {
+            saveAndRender();
+            showToast(`¡Se añadieron ${addedCount} ingredientes al carrito! 🛒`);
+            closeModal('personal-recipes-modal');
+        } else {
+            showToast("Ya tenías todos esos ingredientes en la lista.");
+        }
+    }
+
+    function openCompareModal() {
+        document.getElementById('comp-price-a').value = '';
+        document.getElementById('comp-size-a').value = '';
+        document.getElementById('comp-price-b').value = '';
+        document.getElementById('comp-size-b').value = '';
+        document.getElementById('compare-result').innerHTML = "Ingresa los datos para comparar.";
+        document.getElementById('compare-result').style.background = "var(--bg-color)";
+        document.getElementById('compare-result').style.color = "var(--text-main)";
+        openModal('compare-modal');
+    }
+
+    function calculateBestValue() {
+        const pA = parseFloat(document.getElementById('comp-price-a').value);
+        const sA = parseFloat(document.getElementById('comp-size-a').value);
+        const pB = parseFloat(document.getElementById('comp-price-b').value);
+        const sB = parseFloat(document.getElementById('comp-size-b').value);
+        
+        const resBox = document.getElementById('compare-result');
+
+        if (!pA || !sA || !pB || !sB) {
+            resBox.innerHTML = "Faltan datos por ingresar...";
+            resBox.style.background = "var(--bg-color)";
+            resBox.style.color = "var(--text-main)";
+            return;
+        }
+
+        const unitPriceA = pA / sA;
+        const unitPriceB = pB / sB;
+
+        if (unitPriceA === unitPriceB) {
+            resBox.innerHTML = "🤝 Ambos cuestan exactamente lo mismo por unidad.";
+            resBox.style.background = "#e0e0e0";
+            resBox.style.color = "#333";
+        } else if (unitPriceA < unitPriceB) {
+            const savings = ((unitPriceB - unitPriceA) / unitPriceB) * 100;
+            resBox.innerHTML = `🏆 La <b>Opción A</b> es ${savings.toFixed(1)}% más barata.`;
+            resBox.style.background = "var(--primary-light)";
+            resBox.style.color = "var(--primary)";
+        } else {
+            const savings = ((unitPriceA - unitPriceB) / unitPriceA) * 100;
+            resBox.innerHTML = `🏆 La <b>Opción B</b> es ${savings.toFixed(1)}% más barata.`;
+            resBox.style.background = "#e8f5e9";
+            resBox.style.color = "#2e7d32";
+        }
+    }
+
     function openEdit(id) {
         const item = items.find(i => i.id === id);
         if(!item) return;
